@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Shuffle, VolumeUp, Check, Heart, Lightbulb, Play } from 'lucide-react';
+import { Shuffle, Volume, Check, Heart, Lightbulb, Play } from 'lucide-react';
 
 interface VerseWord {
   id: string;
@@ -127,14 +126,12 @@ const QuranPuzzle = () => {
   }, [gameStarted, difficulty]);
 
   useEffect(() => {
-    // Check if puzzle is complete
     if (arrangedWords.length > 0 && isCorrectArrangement()) {
       handlePuzzleComplete();
     }
   }, [arrangedWords]);
 
   useEffect(() => {
-    // Cleanup audio when component unmounts
     return () => {
       if (audioPlayer) {
         audioPlayer.pause();
@@ -144,7 +141,6 @@ const QuranPuzzle = () => {
   }, []);
 
   const startNewPuzzle = () => {
-    // Select a verse based on difficulty
     let filteredVerses = verses;
     
     switch (difficulty) {
@@ -160,14 +156,12 @@ const QuranPuzzle = () => {
     }
     
     if (filteredVerses.length === 0) {
-      filteredVerses = verses; // Fallback if no verses match the criteria
+      filteredVerses = verses;
     }
     
-    // Randomly select a verse
     const randomIndex = Math.floor(Math.random() * filteredVerses.length);
     const selectedVerse = filteredVerses[randomIndex];
     
-    // Create a copy of words and shuffle them
     const shuffled = [...selectedVerse.words];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -180,7 +174,6 @@ const QuranPuzzle = () => {
     setIsComplete(false);
     setHintUsed(false);
     
-    // Initialize audio player if the verse has an audio URL
     if (selectedVerse.audioUrl) {
       const audio = new Audio(selectedVerse.audioUrl);
       setAudioPlayer(audio);
@@ -219,20 +212,16 @@ const QuranPuzzle = () => {
     if (sourceArea === targetArea) return;
     
     if (sourceArea === 'shuffled' && targetArea === 'arranged') {
-      // Move from shuffled area to arranged area
       setShuffledWords(shuffledWords.filter(w => w.id !== word.id));
       
       if (index !== undefined && index < arrangedWords.length) {
-        // Insert at specific position
         const newArranged = [...arrangedWords];
         newArranged.splice(index, 0, word);
         setArrangedWords(newArranged);
       } else {
-        // Add to the end
         setArrangedWords([...arrangedWords, word]);
       }
     } else if (sourceArea === 'arranged' && targetArea === 'shuffled') {
-      // Move from arranged area to shuffled area
       setArrangedWords(arrangedWords.filter(w => w.id !== word.id));
       setShuffledWords([...shuffledWords, word]);
     }
@@ -240,11 +229,9 @@ const QuranPuzzle = () => {
 
   const handleWordClick = (word: VerseWord, sourceArea: 'shuffled' | 'arranged') => {
     if (sourceArea === 'shuffled') {
-      // Move from shuffled to arranged
       setShuffledWords(shuffledWords.filter(w => w.id !== word.id));
       setArrangedWords([...arrangedWords, word]);
     } else {
-      // Move from arranged to shuffled
       setArrangedWords(arrangedWords.filter(w => w.id !== word.id));
       setShuffledWords([...shuffledWords, word]);
     }
@@ -264,7 +251,6 @@ const QuranPuzzle = () => {
     
     setIsComplete(true);
     
-    // Calculate score
     const baseScore = 100;
     const hintPenalty = hintUsed ? 20 : 0;
     const finalScore = baseScore - hintPenalty;
@@ -273,7 +259,6 @@ const QuranPuzzle = () => {
     
     toast.success('Congratulations! Verse arranged correctly!');
     
-    // Play the audio automatically upon completion
     if (audioPlayer) {
       playAudio();
     }
@@ -284,15 +269,11 @@ const QuranPuzzle = () => {
     
     setHintUsed(true);
     
-    // Find the next correct word position
     const nextPosition = arrangedWords.length;
     const correctWord = currentVerse.words.find(w => w.position === nextPosition);
     
     if (correctWord) {
-      // Remove the word from shuffled words
       setShuffledWords(shuffledWords.filter(w => w.id !== correctWord.id));
-      
-      // Add it to arranged words
       setArrangedWords([...arrangedWords, correctWord]);
     }
   };
@@ -393,7 +374,7 @@ const QuranPuzzle = () => {
                             >
                               {isPlaying ? (
                                 <>
-                                  <VolumeUp className="h-4 w-4" />
+                                  <Volume className="h-4 w-4" />
                                   Playing...
                                 </>
                               ) : (
