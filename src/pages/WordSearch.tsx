@@ -19,7 +19,7 @@ const gameData = {
     ['D', 'S', 'O', 'R', 'N', 'T', 'W', 'O', 'K', 'D'],
     ['T', 'L', 'E', 'V', 'A', 'N', 'I', 'N', 'A', 'A'],
     ['G', 'A', 'I', 'D', 'B', 'N', 'A', 'N', 'T', 'T'],
-    ['Q', 'M', 'D', 'U', 'B', 'N', 'U', 'H', 'G', 'E'],
+    ['Q', 'L', 'D', 'U', 'B', 'N', 'U', 'H', 'G', 'E'],
     ['D', 'H', 'M', 'A', 'A', 'L', 'L', 'A', 'H', 'S']
   ],
   words: [
@@ -30,7 +30,7 @@ const gameData = {
     { word: 'MASJID', found: false, description: 'A place of worship for Muslims.' },
     { word: 'QURAN', found: false, description: 'The holy book of Islam.' },
     { word: 'ALLAH', found: false, description: 'The Arabic word for God in Abrahamic religions.' },
-    { word: 'ZAKAT', found: false, description: 'Giving a fixed portion of one's wealth to charity.' }
+    { word: 'ZAKAT', found: false, description: 'Giving a fixed portion of one\'s wealth to charity.' }
   ]
 };
 
