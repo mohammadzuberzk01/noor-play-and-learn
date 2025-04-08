@@ -132,7 +132,7 @@ const practiceExercises = {
     {
       id: 'a1',
       arabic: 'وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ',
-      transliteration: 'Wa min sharrin-naffaathaati fil-'uqad',
+      transliteration: 'Wa min sharrin-naffaathaati fil-\'uqad',
       meaning: 'And from the evil of the blowers in knots',
       rules: ['idghaam', 'ikhfaa', 'qalqalah'],
       audioUrl: '/tajweed/falaq_4.mp3'
