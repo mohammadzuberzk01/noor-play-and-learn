@@ -7,7 +7,7 @@ import {
   Search, Grid3X3, Puzzle, HelpCircle, Footprints, PenTool, Book, Timer, BookOpen,
   Award, Star, Clock, Flag, Gift, Calendar, Heart, Check, MessageSquare, User,
   Users, Shield, AlertTriangle, HelpCircle as QuestionMark, BookOpen as QuranBook,
-  Volume, Headphones, Link, Edit, Copy, AlertCircle
+  Volume, Headphones, Link, Edit, Copy, AlertCircle, Brain
 } from 'lucide-react';
 
 const Games = () => {
@@ -75,7 +75,7 @@ const Games = () => {
             icon={Users}
             path="/games/quiz-duel"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -84,7 +84,7 @@ const Games = () => {
             icon={Star}
             path="/games/sahaba-showdown"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -93,7 +93,7 @@ const Games = () => {
             icon={Calendar}
             path="/games/prophet-path"
             difficulty="hard"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -111,7 +111,7 @@ const Games = () => {
             icon={Search}
             path="/games/hadith-hunt"
             difficulty="hard"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -121,6 +121,24 @@ const Games = () => {
             path="/games/true-false"
             difficulty="easy"
             comingSoon={false}
+          />
+          
+          <GameCard
+            title="'Fard' or 'Sunnah'?"
+            description="Categorize daily actions as fard, sunnah, mustahab, or mubah."
+            icon={HelpCircle}
+            path="/games/fard-or-sunnah"
+            difficulty="medium"
+            comingSoon={false}
+          />
+          
+          <GameCard
+            title="Fiqh Mastermind"
+            description="Choose a madhhab and solve practical fiqh situations."
+            icon={Brain}
+            path="/games/fiqh-mastermind"
+            difficulty="hard"
+            comingSoon={true}
           />
         </div>
         
@@ -196,7 +214,7 @@ const Games = () => {
             icon={Star}
             path="/games/hifz-hero"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard

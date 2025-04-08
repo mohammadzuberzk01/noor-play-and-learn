@@ -21,6 +21,12 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import NinetyNineNames from "./pages/NinetyNineNames";
 import TrueOrFalse from "./pages/TrueOrFalse";
+import QuizDuel from "./pages/QuizDuel";
+import SahabaShowdown from "./pages/SahabaShowdown";
+import ProphetPath from "./pages/ProphetPath";
+import HadithHunt from "./pages/HadithHunt";
+import FardOrSunnah from "./pages/FardOrSunnah";
+import HifzHero from "./pages/HifzHero";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +50,12 @@ const App = () => (
           <Route path="/games/stories" element={<Stories />} />
           <Route path="/games/99-names" element={<NinetyNineNames />} />
           <Route path="/games/true-false" element={<TrueOrFalse />} />
+          <Route path="/games/quiz-duel" element={<QuizDuel />} />
+          <Route path="/games/sahaba-showdown" element={<SahabaShowdown />} />
+          <Route path="/games/prophet-path" element={<ProphetPath />} />
+          <Route path="/games/hadith-hunt" element={<HadithHunt />} />
+          <Route path="/games/fard-or-sunnah" element={<FardOrSunnah />} />
+          <Route path="/games/hifz-hero" element={<HifzHero />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/about" element={<About />} />
