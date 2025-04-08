@@ -157,7 +157,7 @@ const Games = () => {
             icon={Volume}
             path="/games/tajweed-trainer"
             difficulty="hard"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
