@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -138,7 +137,7 @@ const Games = () => {
             icon={Brain}
             path="/games/fiqh-mastermind"
             difficulty="hard"
-            comingSoon={true}
+            comingSoon={false}
           />
         </div>
         

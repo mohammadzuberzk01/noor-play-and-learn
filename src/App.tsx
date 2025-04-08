@@ -27,6 +27,7 @@ import ProphetPath from "./pages/ProphetPath";
 import HadithHunt from "./pages/HadithHunt";
 import FardOrSunnah from "./pages/FardOrSunnah";
 import HifzHero from "./pages/HifzHero";
+import FiqhMastermind from "./pages/FiqhMastermind";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
           <Route path="/games/hadith-hunt" element={<HadithHunt />} />
           <Route path="/games/fard-or-sunnah" element={<FardOrSunnah />} />
           <Route path="/games/hifz-hero" element={<HifzHero />} />
+          <Route path="/games/fiqh-mastermind" element={<FiqhMastermind />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/about" element={<About />} />
