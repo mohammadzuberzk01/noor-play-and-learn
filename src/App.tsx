@@ -19,6 +19,8 @@ import Profile from "./pages/Profile";
 import Achievements from "./pages/Achievements";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import NinetyNineNames from "./pages/NinetyNineNames";
+import TrueOrFalse from "./pages/TrueOrFalse";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => (
           <Route path="/games/quran-puzzle" element={<QuranPuzzle />} />
           <Route path="/games/ramadan-timer" element={<RamadanTimer />} />
           <Route path="/games/stories" element={<Stories />} />
+          <Route path="/games/99-names" element={<NinetyNineNames />} />
+          <Route path="/games/true-false" element={<TrueOrFalse />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/about" element={<About />} />
