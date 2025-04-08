@@ -285,7 +285,7 @@ const Games = () => {
             icon={Clock}
             path="/games/salah-streak"
             difficulty="easy"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
