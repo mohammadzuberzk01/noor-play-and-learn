@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Star, Brain, Award, Play, Pause, RotateCcw, VolumeUp, Volume2 } from 'lucide-react';
+import { BookOpen, Star, Brain, Award, Play, Pause, RotateCcw, Volume, Volume2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Surah {
