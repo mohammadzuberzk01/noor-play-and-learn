@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -166,7 +167,7 @@ const Games = () => {
             icon={Link}
             path="/games/verse-match"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -175,7 +176,7 @@ const Games = () => {
             icon={BookOpen}
             path="/games/hadith-collector"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -184,7 +185,7 @@ const Games = () => {
             icon={Headphones}
             path="/games/ayah-audio"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -193,7 +194,7 @@ const Games = () => {
             icon={Edit}
             path="/games/word-by-word"
             difficulty="hard"
-            comingSoon={true}
+            comingSoon={false}
           />
         </div>
         
@@ -222,7 +223,7 @@ const Games = () => {
             icon={Users}
             path="/games/prophet-match"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -231,7 +232,7 @@ const Games = () => {
             icon={Volume}
             path="/games/sound-salah"
             difficulty="easy"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -240,7 +241,7 @@ const Games = () => {
             icon={Copy}
             path="/games/flashcards"
             difficulty="easy"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -249,7 +250,7 @@ const Games = () => {
             icon={Puzzle}
             path="/games/pillars-puzzle"
             difficulty="easy"
-            comingSoon={true}
+            comingSoon={false}
           />
         </div>
         
@@ -294,7 +295,7 @@ const Games = () => {
             icon={Heart}
             path="/games/dhikr-quest"
             difficulty="easy"
-            comingSoon={true}
+            comingSoon={false}
           />
           
           <GameCard
@@ -303,7 +304,7 @@ const Games = () => {
             icon={Calendar}
             path="/games/muslim-tracker"
             difficulty="medium"
-            comingSoon={true}
+            comingSoon={false}
           />
         </div>
       </main>

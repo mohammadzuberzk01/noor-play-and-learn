@@ -30,6 +30,16 @@ import HifzHero from "./pages/HifzHero";
 import FiqhMastermind from "./pages/FiqhMastermind";
 import TajweedTrainer from "./pages/TajweedTrainer";
 import SalahStreak from "./pages/SalahStreak";
+import VerseMatch from "./pages/VerseMatch";
+import HadithCollector from "./pages/HadithCollector";
+import AyahAudio from "./pages/AyahAudio";
+import WordByWord from "./pages/WordByWord";
+import ProphetMatch from "./pages/ProphetMatch";
+import SoundSalah from "./pages/SoundSalah";
+import Flashcards from "./pages/Flashcards";
+import PillarsPuzzle from "./pages/PillarsPuzzle";
+import DhikrQuest from "./pages/DhikrQuest";
+import MuslimTracker from "./pages/MuslimTracker";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +72,16 @@ const App = () => (
           <Route path="/games/fiqh-mastermind" element={<FiqhMastermind />} />
           <Route path="/games/tajweed-trainer" element={<TajweedTrainer />} />
           <Route path="/games/salah-streak" element={<SalahStreak />} />
+          <Route path="/games/verse-match" element={<VerseMatch />} />
+          <Route path="/games/hadith-collector" element={<HadithCollector />} />
+          <Route path="/games/ayah-audio" element={<AyahAudio />} />
+          <Route path="/games/word-by-word" element={<WordByWord />} />
+          <Route path="/games/prophet-match" element={<ProphetMatch />} />
+          <Route path="/games/sound-salah" element={<SoundSalah />} />
+          <Route path="/games/flashcards" element={<Flashcards />} />
+          <Route path="/games/pillars-puzzle" element={<PillarsPuzzle />} />
+          <Route path="/games/dhikr-quest" element={<DhikrQuest />} />
+          <Route path="/games/muslim-tracker" element={<MuslimTracker />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/about" element={<About />} />
