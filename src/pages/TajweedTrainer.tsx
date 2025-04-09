@@ -18,13 +18,13 @@ const tajweedRules = [
       {
         arabic: 'مِن رَّبِّهِمْ',
         transliteration: 'Mir Rabbihim',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/idghaam1.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/2.mp3',
         surah: 'Al-Baqarah 2:5'
       },
       {
         arabic: 'قُل رَّبِّ',
         transliteration: 'Qur Rabbi',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/idghaam2.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/23.mp3',
         surah: 'Al-Mu\'minun 23:118'
       }
     ]
@@ -37,13 +37,13 @@ const tajweedRules = [
       {
         arabic: 'مِن كُلِّ',
         transliteration: 'Min Kulli',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/ikhfaa_example1.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/14.mp3',
         surah: 'Ibrahim 14:34'
       },
       {
         arabic: 'أَنفُسَكُمْ',
         transliteration: 'Anfusakum',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/ikhfaa_example2.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/2.mp3',
         surah: 'Al-Baqarah 2:284'
       }
     ]
@@ -56,13 +56,13 @@ const tajweedRules = [
       {
         arabic: 'قُلْ أَعُوذُ',
         transliteration: 'Qul a\'oodhu',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/qalqalah_example1.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/113.mp3',
         surah: 'Al-Falaq 113:1'
       },
       {
         arabic: 'وَتَبَّ',
         transliteration: 'Wa tabb',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/qalqalah_example2.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/111.mp3',
         surah: 'Al-Masad 111:1'
       }
     ]
@@ -75,13 +75,13 @@ const tajweedRules = [
       {
         arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
         transliteration: 'Laa ilaaha illallah',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/madd_example1.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/47.mp3',
         surah: 'Muhammad 47:19'
       },
       {
         arabic: 'آمَنُوا',
         transliteration: 'Aamanoo',
-        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/madd_example2.mp3',
+        audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/2.mp3',
         surah: 'Al-Baqarah 2:3'
       }
     ]
@@ -96,7 +96,7 @@ const practiceExercises = {
       transliteration: 'Bismillahir Rahmanir Raheem',
       meaning: 'In the name of Allah, the Most Gracious, the Most Merciful',
       rules: ['idghaam', 'madd'],
-      audioUrl: 'https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3'
+      audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3'
     },
     {
       id: 'b2',
@@ -104,7 +104,7 @@ const practiceExercises = {
       transliteration: 'Qul huwa Allahu ahad',
       meaning: 'Say, "He is Allah, [who is] One"',
       rules: ['qalqalah', 'madd'],
-      audioUrl: 'https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/112001.mp3'
+      audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/112.mp3'
     }
   ],
   intermediate: [
@@ -114,7 +114,7 @@ const practiceExercises = {
       transliteration: 'Wa maa adraaka mal qaari\'ah',
       meaning: 'And what can make you know what is the Striking Calamity?',
       rules: ['madd', 'qalqalah', 'ikhfaa'],
-      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/qariah_3.mp3'
+      audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/101.mp3'
     },
     {
       id: 'i2',
@@ -122,7 +122,7 @@ const practiceExercises = {
       transliteration: 'Innal insaana lafee khusr',
       meaning: 'Indeed, mankind is in loss',
       rules: ['idghaam', 'ikhfaa'],
-      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/asr_2.mp3'
+      audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/103.mp3'
     }
   ],
   advanced: [
@@ -132,7 +132,7 @@ const practiceExercises = {
       transliteration: 'Wa min sharrin-naffaathaati fil-\'uqad',
       meaning: 'And from the evil of the blowers in knots',
       rules: ['idghaam', 'ikhfaa', 'qalqalah'],
-      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/falaq_4.mp3'
+      audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/113.mp3'
     },
     {
       id: 'a2',
@@ -140,7 +140,7 @@ const practiceExercises = {
       transliteration: 'Alam nashrah laka sadrak',
       meaning: 'Have We not expanded for you your breast?',
       rules: ['qalqalah', 'ikhfaa'],
-      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/sharh_1.mp3'
+      audioUrl: 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/94.mp3'
     }
   ]
 };
@@ -283,6 +283,13 @@ const TajweedTrainer: React.FC = () => {
   };
 
   useEffect(() => {
+    if (currentExercise?.audioUrl) {
+      const audioElement = new Audio();
+      audioElement.src = currentExercise.audioUrl;
+      audioElement.preload = 'auto';
+      audioRef.current = audioElement;
+    }
+    
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
         mediaRecorderRef.current.stop();
@@ -292,7 +299,7 @@ const TajweedTrainer: React.FC = () => {
         audioRef.current.pause();
       }
     };
-  }, []);
+  }, [currentExercise]);
 
   return (
     <div className="min-h-screen flex flex-col islamic-pattern-bg">
