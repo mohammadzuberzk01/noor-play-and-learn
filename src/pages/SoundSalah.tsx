@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -25,6 +26,7 @@ const SoundSalah = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameOver, setGameOver] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -34,7 +36,7 @@ const SoundSalah = () => {
       name: "Fajr",
       arabicName: "الفجر",
       icon: Sunrise,
-      audioUrl: "https://www.islamcan.com/audio/adhan/fajr.mp3",
+      audioUrl: "https://islamic-audio-library.com/audio/adhans/fajr_adhan.mp3",
       matched: false,
       selected: false
     },
@@ -43,7 +45,7 @@ const SoundSalah = () => {
       name: "Dhuhr",
       arabicName: "الظهر",
       icon: Sun,
-      audioUrl: "https://www.islamcan.com/audio/adhan/regular.mp3",
+      audioUrl: "https://islamic-audio-library.com/audio/adhans/standard_adhan.mp3",
       matched: false,
       selected: false
     },
@@ -52,7 +54,7 @@ const SoundSalah = () => {
       name: "Asr",
       arabicName: "العصر",
       icon: Sun,
-      audioUrl: "https://www.islamcan.com/audio/adhan/regular.mp3",
+      audioUrl: "https://islamic-audio-library.com/audio/adhans/standard_adhan.mp3",
       matched: false,
       selected: false
     },
@@ -61,7 +63,7 @@ const SoundSalah = () => {
       name: "Maghrib",
       arabicName: "المغرب",
       icon: Sunset,
-      audioUrl: "https://www.islamcan.com/audio/adhan/regular.mp3",
+      audioUrl: "https://islamic-audio-library.com/audio/adhans/standard_adhan.mp3",
       matched: false,
       selected: false
     },
@@ -70,11 +72,14 @@ const SoundSalah = () => {
       name: "Isha",
       arabicName: "العشاء",
       icon: Sunset,
-      audioUrl: "https://www.islamcan.com/audio/adhan/regular.mp3",
+      audioUrl: "https://islamic-audio-library.com/audio/adhans/standard_adhan.mp3",
       matched: false,
       selected: false
     }
   ];
+
+  // Use publicly available adhan audio if the custom URLs fail
+  const fallbackAudioUrl = "https://islamcan.com/audio/adhan/azan1.mp3";
   
   useEffect(() => {
     if (isPlaying) {
@@ -89,6 +94,14 @@ const SoundSalah = () => {
       setTimeLeft(60);
       setGameOver(false);
     }
+
+    // Cleanup any playing audio when component unmounts
+    return () => {
+      if (currentAudio) {
+        currentAudio.pause();
+        setCurrentAudio(null);
+      }
+    };
   }, [isPlaying]);
   
   useEffect(() => {
@@ -106,10 +119,44 @@ const SoundSalah = () => {
   }, [timeLeft, isPlaying, gameOver, score]);
   
   const playAudio = (url: string) => {
-    if (audioRef.current) {
-      audioRef.current.src = url;
-      audioRef.current.play();
+    // Stop any currently playing audio
+    if (currentAudio) {
+      currentAudio.pause();
     }
+    
+    // Create and play new audio
+    const audio = new Audio(url);
+    
+    // Add error handling
+    audio.onerror = () => {
+      console.error(`Error playing audio from URL: ${url}`);
+      toast({
+        title: "Audio Error",
+        description: "Could not play the audio. Trying alternative source...",
+        variant: "destructive"
+      });
+      
+      // Try fallback URL if original fails
+      const fallbackAudio = new Audio(fallbackAudioUrl);
+      fallbackAudio.play().catch(err => {
+        console.error("Fallback audio also failed:", err);
+        toast({
+          title: "Audio Error",
+          description: "Audio playback failed. Please check your connection.",
+          variant: "destructive"
+        });
+      });
+      
+      setCurrentAudio(fallbackAudio);
+    };
+    
+    // Play the audio
+    audio.play().catch(err => {
+      console.error("Audio playback failed:", err);
+      audio.onerror(new ErrorEvent('error'));
+    });
+    
+    setCurrentAudio(audio);
   };
   
   const handleSalahSelect = (id: number) => {

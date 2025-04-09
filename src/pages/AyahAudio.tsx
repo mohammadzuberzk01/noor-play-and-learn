@@ -33,7 +33,7 @@ const AyahAudio = () => {
       id: 1,
       arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
       translation: "In the name of Allah, the Most Gracious, the Most Merciful",
-      audioUrl: "https://www.islamcan.com/audio/quran/verse/001-001.mp3",
+      audioUrl: "https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3",
       surah: "Al-Fatihah",
       ayahNumber: "1:1",
       options: [
@@ -47,7 +47,7 @@ const AyahAudio = () => {
       id: 2,
       arabic: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ",
       translation: "All praise is due to Allah, Lord of the worlds",
-      audioUrl: "https://www.islamcan.com/audio/quran/verse/001-002.mp3",
+      audioUrl: "https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001002.mp3",
       surah: "Al-Fatihah",
       ayahNumber: "1:2",
       options: [
@@ -61,7 +61,7 @@ const AyahAudio = () => {
       id: 3,
       arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ",
       translation: "Say, 'He is Allah, [who is] One'",
-      audioUrl: "https://www.islamcan.com/audio/quran/verse/112-001.mp3",
+      audioUrl: "https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/112001.mp3",
       surah: "Al-Ikhlas",
       ayahNumber: "112:1",
       options: [
@@ -75,7 +75,7 @@ const AyahAudio = () => {
       id: 4,
       arabic: "اللَّهُ الصَّمَدُ",
       translation: "Allah, the Eternal Refuge",
-      audioUrl: "https://www.islamcan.com/audio/quran/verse/112-002.mp3",
+      audioUrl: "https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/112002.mp3",
       surah: "Al-Ikhlas",
       ayahNumber: "112:2",
       options: [
@@ -89,7 +89,7 @@ const AyahAudio = () => {
       id: 5,
       arabic: "وَالْعَصْرِ",
       translation: "By time",
-      audioUrl: "https://www.islamcan.com/audio/quran/verse/103-001.mp3",
+      audioUrl: "https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/103001.mp3",
       surah: "Al-Asr",
       ayahNumber: "103:1",
       options: [
@@ -126,7 +126,15 @@ const AyahAudio = () => {
   
   const playAudio = () => {
     if (audioRef.current) {
-      audioRef.current.play();
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(err => {
+        console.error("Audio playback failed:", err);
+        toast({
+          title: "Audio playback error",
+          description: "Unable to play the audio. Please try again.",
+          variant: "destructive"
+        });
+      });
     }
   };
   
@@ -234,7 +242,20 @@ const AyahAudio = () => {
             <Card className="p-6 mb-6">
               <div className="text-center">
                 <p className="text-2xl text-right mb-4">{currentAyah?.arabic}</p>
-                <audio ref={audioRef} src={currentAyah?.audioUrl} className="hidden" />
+                <audio 
+                  ref={audioRef} 
+                  src={currentAyah?.audioUrl} 
+                  className="hidden" 
+                  onLoadedData={() => console.log("Audio loaded successfully")}
+                  onError={(e) => {
+                    console.error("Audio error:", e);
+                    toast({
+                      title: "Audio Error",
+                      description: "There was a problem loading the audio. Please try refreshing.",
+                      variant: "destructive"
+                    });
+                  }}
+                />
                 <Button 
                   variant="outline" 
                   size="lg" 

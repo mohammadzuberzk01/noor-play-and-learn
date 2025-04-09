@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -20,13 +19,13 @@ const tajweedRules = [
       {
         arabic: 'مِن رَّبِّهِمْ',
         transliteration: 'Mir Rabbihim',
-        audioUrl: '/tajweed/idghaam_example1.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/idghaam1.mp3',
         surah: 'Al-Baqarah 2:5'
       },
       {
         arabic: 'قُل رَّبِّ',
         transliteration: 'Qur Rabbi',
-        audioUrl: '/tajweed/idghaam_example2.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/idghaam2.mp3',
         surah: 'Al-Mu\'minun 23:118'
       }
     ]
@@ -39,13 +38,13 @@ const tajweedRules = [
       {
         arabic: 'مِن كُلِّ',
         transliteration: 'Min Kulli',
-        audioUrl: '/tajweed/ikhfaa_example1.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/ikhfaa_example1.mp3',
         surah: 'Ibrahim 14:34'
       },
       {
         arabic: 'أَنفُسَكُمْ',
         transliteration: 'Anfusakum',
-        audioUrl: '/tajweed/ikhfaa_example2.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/ikhfaa_example2.mp3',
         surah: 'Al-Baqarah 2:284'
       }
     ]
@@ -58,13 +57,13 @@ const tajweedRules = [
       {
         arabic: 'قُلْ أَعُوذُ',
         transliteration: 'Qul a\'oodhu',
-        audioUrl: '/tajweed/qalqalah_example1.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/qalqalah_example1.mp3',
         surah: 'Al-Falaq 113:1'
       },
       {
         arabic: 'وَتَبَّ',
         transliteration: 'Wa tabb',
-        audioUrl: '/tajweed/qalqalah_example2.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/qalqalah_example2.mp3',
         surah: 'Al-Masad 111:1'
       }
     ]
@@ -77,13 +76,13 @@ const tajweedRules = [
       {
         arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
         transliteration: 'Laa ilaaha illallah',
-        audioUrl: '/tajweed/madd_example1.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/madd_example1.mp3',
         surah: 'Muhammad 47:19'
       },
       {
         arabic: 'آمَنُوا',
         transliteration: 'Aamanoo',
-        audioUrl: '/tajweed/madd_example2.mp3',
+        audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/madd_example2.mp3',
         surah: 'Al-Baqarah 2:3'
       }
     ]
@@ -95,11 +94,11 @@ const practiceExercises = {
   beginner: [
     {
       id: 'b1',
-      arabic: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+      arabic: 'بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ',
       transliteration: 'Bismillahir Rahmanir Raheem',
       meaning: 'In the name of Allah, the Most Gracious, the Most Merciful',
       rules: ['idghaam', 'madd'],
-      audioUrl: '/tajweed/bismillah.mp3'
+      audioUrl: 'https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/001001.mp3'
     },
     {
       id: 'b2',
@@ -107,7 +106,7 @@ const practiceExercises = {
       transliteration: 'Qul huwa Allahu ahad',
       meaning: 'Say, "He is Allah, [who is] One"',
       rules: ['qalqalah', 'madd'],
-      audioUrl: '/tajweed/ikhlas_1.mp3'
+      audioUrl: 'https://www.everyayah.com/data/AbdulSamad_64kbps_QuranExplorer.Com/112001.mp3'
     }
   ],
   intermediate: [
@@ -117,7 +116,7 @@ const practiceExercises = {
       transliteration: 'Wa maa adraaka mal qaari\'ah',
       meaning: 'And what can make you know what is the Striking Calamity?',
       rules: ['madd', 'qalqalah', 'ikhfaa'],
-      audioUrl: '/tajweed/qariah_3.mp3'
+      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/qariah_3.mp3'
     },
     {
       id: 'i2',
@@ -125,7 +124,7 @@ const practiceExercises = {
       transliteration: 'Innal insaana lafee khusr',
       meaning: 'Indeed, mankind is in loss',
       rules: ['idghaam', 'ikhfaa'],
-      audioUrl: '/tajweed/asr_2.mp3'
+      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/asr_2.mp3'
     }
   ],
   advanced: [
@@ -135,7 +134,7 @@ const practiceExercises = {
       transliteration: 'Wa min sharrin-naffaathaati fil-\'uqad',
       meaning: 'And from the evil of the blowers in knots',
       rules: ['idghaam', 'ikhfaa', 'qalqalah'],
-      audioUrl: '/tajweed/falaq_4.mp3'
+      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/falaq_4.mp3'
     },
     {
       id: 'a2',
@@ -143,7 +142,7 @@ const practiceExercises = {
       transliteration: 'Alam nashrah laka sadrak',
       meaning: 'Have We not expanded for you your breast?',
       rules: ['qalqalah', 'ikhfaa'],
-      audioUrl: '/tajweed/sharh_1.mp3'
+      audioUrl: 'https://www.islamicnet.com/islamic-audios/tajweed/sharh_1.mp3'
     }
   ]
 };
@@ -162,11 +161,12 @@ const TajweedTrainer: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  // Mock function to simulate voice recognition feedback
-  const analyzePronunciation = () => {
-    // In a real app, this would use a speech recognition API
-    const randomScore = Math.random();
-    return randomScore;
+  const playExampleAudio = (url: string) => {
+    const audio = new Audio(url);
+    audio.play().catch(err => {
+      console.error("Audio playback failed:", err);
+      toast.error("Audio playback failed. Please try again.");
+    });
   };
 
   const handleRuleSelect = (ruleId: string) => {
@@ -189,7 +189,11 @@ const TajweedTrainer: React.FC = () => {
 
   const playAudio = () => {
     if (audioRef.current) {
-      audioRef.current.play();
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(err => {
+        console.error("Audio playback failed:", err);
+        toast.error("Audio playback failed. Please try again.");
+      });
       setIsPlaying(true);
     }
   };
@@ -269,7 +273,6 @@ const TajweedTrainer: React.FC = () => {
   };
 
   useEffect(() => {
-    // Clean up media resources when component unmounts
     return () => {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
         mediaRecorderRef.current.stop();
@@ -342,7 +345,12 @@ const TajweedTrainer: React.FC = () => {
                           <Badge variant="outline">{example.surah}</Badge>
                         </div>
                         <div className="flex justify-end mt-2">
-                          <Button variant="outline" size="sm" className="flex items-center gap-1">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="flex items-center gap-1"
+                            onClick={() => playExampleAudio(example.audioUrl)}
+                          >
                             <Volume className="h-4 w-4" />
                             <span>Listen</span>
                           </Button>
@@ -413,7 +421,7 @@ const TajweedTrainer: React.FC = () => {
                       </CardDescription>
                     </div>
                     <div className="flex gap-1">
-                      {currentExercise.rules.map(rule => {
+                      {currentExercise?.rules.map(rule => {
                         const ruleInfo = tajweedRules.find(r => r.id === rule);
                         return (
                           <Badge key={rule} variant="outline" className="text-xs">
@@ -426,9 +434,9 @@ const TajweedTrainer: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="p-5 bg-slate-50 rounded-md mb-6">
-                    <p className="text-2xl font-arabic mb-3 text-center">{currentExercise.arabic}</p>
-                    <p className="text-sm text-center mb-1">{currentExercise.transliteration}</p>
-                    <p className="text-xs text-muted-foreground text-center italic">"{currentExercise.meaning}"</p>
+                    <p className="text-2xl font-arabic mb-3 text-center">{currentExercise?.arabic}</p>
+                    <p className="text-sm text-center mb-1">{currentExercise?.transliteration}</p>
+                    <p className="text-xs text-muted-foreground text-center italic">"{currentExercise?.meaning}"</p>
                     
                     <div className="flex justify-center mt-4 gap-2">
                       {!isPlaying ? (
@@ -453,7 +461,7 @@ const TajweedTrainer: React.FC = () => {
                       
                       <audio 
                         ref={audioRef}
-                        src={currentExercise.audioUrl} 
+                        src={currentExercise?.audioUrl} 
                         onEnded={() => setIsPlaying(false)}
                         className="hidden"
                       />
