@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -80,7 +81,7 @@ const Games = () => {
           <GameCard
             title="Match the Meaning"
             description="Match Arabic Qur'anic words to their English meanings with a timer."
-            icon={Language}
+            icon={Languages}
             path="/games/match-the-meaning"
             difficulty="medium"
             comingSoon={false}
