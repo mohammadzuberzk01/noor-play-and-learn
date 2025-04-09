@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -7,7 +6,7 @@ import {
   Search, Grid3X3, Puzzle, HelpCircle, Footprints, PenTool, Book, Timer, BookOpen,
   Award, Star, Clock, Flag, Gift, Calendar, Heart, Check, MessageSquare, User,
   Users, Shield, AlertTriangle, HelpCircle as QuestionMark, BookOpen as QuranBook,
-  Volume, Headphones, Link, Edit, Copy, AlertCircle, Brain
+  Volume, Headphones, Link, Edit, Copy, AlertCircle, Brain, PuzzleIcon, Language, BookText, Sparkles, LanguagesIcon
 } from 'lucide-react';
 
 const Games = () => {
@@ -73,7 +72,16 @@ const Games = () => {
             title="Word Hunt: Qur'an Edition"
             description="Find hidden Arabic words from the Qur'an in a puzzle grid."
             icon={Search}
-            path="/games/word-hunt"
+            path="/games/word-hunt-quranic"
+            difficulty="medium"
+            comingSoon={false}
+          />
+          
+          <GameCard
+            title="Match the Meaning"
+            description="Match Arabic Qur'anic words to their English meanings with a timer."
+            icon={Language}
+            path="/games/match-the-meaning"
             difficulty="medium"
             comingSoon={false}
           />

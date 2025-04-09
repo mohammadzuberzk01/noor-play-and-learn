@@ -63,12 +63,13 @@ const DhikrQuest = () => {
       toast({
         title: "Dhikr Completed!",
         description: `You completed ${dhikrName} for today. Keep up the good work!`,
+        variant: "default"
       });
     } else {
       toast({
         title: "Already Completed",
         description: `You have already completed ${dhikrName} for today.`,
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };

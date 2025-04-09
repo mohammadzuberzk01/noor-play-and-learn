@@ -27,12 +27,10 @@ const ProphetMatch = () => {
   const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
-    // Shuffle prophets on mount
     shuffleProphets();
   }, []);
 
   useEffect(() => {
-    // Check if all pairs are matched
     if (matchedPairs.length === prophets.length * 2) {
       setGameOver(true);
       toast({

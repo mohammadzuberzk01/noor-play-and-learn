@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -40,13 +39,14 @@ import Flashcards from "./pages/Flashcards";
 import PillarsPuzzle from "./pages/PillarsPuzzle";
 import DhikrQuest from "./pages/DhikrQuest";
 import MuslimTracker from "./pages/MuslimTracker";
-// New game imports
 import WordHunt from "./pages/WordHunt";
 import RootWordBuilder from "./pages/RootWordBuilder";
 import AyahBreakdown from "./pages/AyahBreakdown";
 import WordOfTheDay from "./pages/WordOfTheDay";
 import QuranicWordBingo from "./pages/QuranicWordBingo";
 import HarakahHero from "./pages/HarakahHero";
+import WordHuntQuranic from "./pages/WordHuntQuranic";
+import MatchTheMeaning from "./pages/MatchTheMeaning";
 
 const queryClient = new QueryClient();
 
@@ -89,17 +89,17 @@ const App = () => (
           <Route path="/games/pillars-puzzle" element={<PillarsPuzzle />} />
           <Route path="/games/dhikr-quest" element={<DhikrQuest />} />
           <Route path="/games/muslim-tracker" element={<MuslimTracker />} />
-          {/* New game routes */}
           <Route path="/games/word-hunt" element={<WordHunt />} />
           <Route path="/games/root-word-builder" element={<RootWordBuilder />} />
           <Route path="/games/ayah-breakdown" element={<AyahBreakdown />} />
           <Route path="/games/word-of-the-day" element={<WordOfTheDay />} />
           <Route path="/games/quranic-word-bingo" element={<QuranicWordBingo />} />
           <Route path="/games/harakah-hero" element={<HarakahHero />} />
+          <Route path="/games/word-hunt-quranic" element={<WordHuntQuranic />} />
+          <Route path="/games/match-the-meaning" element={<MatchTheMeaning />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/about" element={<About />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
