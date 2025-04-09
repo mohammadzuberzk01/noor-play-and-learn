@@ -46,7 +46,7 @@ const WordHuntQuranic = () => {
   }, [gameStarted, difficulty]);
 
   useEffect(() => {
-    let interval: number;
+    let interval: ReturnType<typeof setInterval>;
     if (gameStarted && !gameOver && timer > 0) {
       interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);

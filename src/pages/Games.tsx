@@ -6,7 +6,7 @@ import {
   Search, Grid3X3, Puzzle, HelpCircle, Footprints, PenTool, Book, Timer, BookOpen,
   Award, Star, Clock, Flag, Gift, Calendar, Heart, Check, MessageSquare, User,
   Users, Shield, AlertTriangle, HelpCircle as QuestionMark, BookOpen as QuranBook,
-  Volume, Headphones, Link, Edit, Copy, AlertCircle, Brain, PuzzleIcon, Language, BookText, Sparkles, LanguagesIcon
+  Volume, Headphones, Link, Edit, Copy, AlertCircle, Brain, PuzzleIcon, Languages, BookText, Sparkles
 } from 'lucide-react';
 
 const Games = () => {

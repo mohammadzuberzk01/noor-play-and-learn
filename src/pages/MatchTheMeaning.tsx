@@ -48,7 +48,7 @@ const MatchTheMeaning = () => {
 
   // Timer countdown
   useEffect(() => {
-    let interval: number;
+    let interval: ReturnType<typeof setInterval>;
     if (gameStarted && !gameOver && timer > 0) {
       interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
@@ -309,12 +309,12 @@ const MatchTheMeaning = () => {
                 <div className="grid grid-cols-2 gap-2">
                   {arabicOptions.map((arabic, index) => {
                     const pair = vocabularyPairs.find(p => p.arabic === arabic);
-                    const isAlreadyMatched = pair && isMatched(pair.id);
+                    const isAlreadyMatched = pair && matchedPairs.includes(pair.id);
                     
                     return (
                       <Button
                         key={index}
-                        variant={isAlreadyMatched ? "success" : (selectedArabic === arabic ? "default" : "outline")}
+                        variant={isAlreadyMatched ? "default" : (selectedArabic === arabic ? "default" : "outline")}
                         className={`text-xl h-16 ${isAlreadyMatched ? "opacity-50 pointer-events-none" : ""}`}
                         onClick={() => handleArabicSelect(arabic)}
                         disabled={isAlreadyMatched}
@@ -331,12 +331,12 @@ const MatchTheMeaning = () => {
                 <div className="grid grid-cols-2 gap-2">
                   {englishOptions.map((english, index) => {
                     const pair = vocabularyPairs.find(p => p.english === english);
-                    const isAlreadyMatched = pair && isMatched(pair.id);
+                    const isAlreadyMatched = pair && matchedPairs.includes(pair.id);
                     
                     return (
                       <Button
                         key={index}
-                        variant={isAlreadyMatched ? "success" : (selectedEnglish === english ? "default" : "outline")}
+                        variant={isAlreadyMatched ? "default" : (selectedEnglish === english ? "default" : "outline")}
                         className={`h-16 ${isAlreadyMatched ? "opacity-50 pointer-events-none" : ""}`}
                         onClick={() => handleEnglishSelect(english)}
                         disabled={isAlreadyMatched}
