@@ -9,7 +9,6 @@ import { Progress } from '@/components/ui/progress';
 import { Volume, Mic, PlayCircle, PauseCircle, AlertCircle, CheckCircle, Book } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Tajweed rules with examples
 const tajweedRules = [
   {
     id: 'idghaam',
@@ -89,7 +88,6 @@ const tajweedRules = [
   }
 ];
 
-// Practice exercises structured by level
 const practiceExercises = {
   beginner: [
     {
@@ -205,6 +203,19 @@ const TajweedTrainer: React.FC = () => {
     }
   };
 
+  const analyzePronunciation = (): number => {
+    const baseScore = Math.random() * 0.7;
+    const biasedScore = 0.3 + baseScore;
+    const difficultyAdjustment = 
+      practiceLevel === 'beginner' ? 0.1 :
+      practiceLevel === 'intermediate' ? 0 : -0.1;
+      
+    let adjustedScore = biasedScore + difficultyAdjustment;
+    adjustedScore = Math.max(0, Math.min(1, adjustedScore));
+    
+    return adjustedScore;
+  };
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -237,7 +248,6 @@ const TajweedTrainer: React.FC = () => {
       
       toast("Recording started. Recite the verse...");
       
-      // Auto-stop after 5 seconds
       setTimeout(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
           stopRecording();
