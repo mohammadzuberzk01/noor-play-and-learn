@@ -23,10 +23,10 @@ const PillarsPuzzle = () => {
   const [isComplete, setIsComplete] = useState(false);
   const [timeTaken, setTimeTaken] = useState(0);
   const [draggedPiece, setDraggedPiece] = useState<PuzzlePiece | null>(null);
+  const [currentDifficulty, setCurrentDifficulty] = useState('easy');
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Puzzle pieces data
   const puzzleData: PuzzlePiece[] = [
     {
       id: 1,
@@ -65,27 +65,29 @@ const PillarsPuzzle = () => {
     }
   ];
   
-  // Initialize game
+  const generatePuzzle = (level: string) => {
+    console.log(`Generating puzzle with difficulty: ${level}`);
+    const shuffled = [...puzzleData]
+      .sort(() => Math.random() - 0.5)
+      .map((piece, index) => ({ ...piece, position: index + 1 }));
+    
+    setPieces(shuffled);
+    setDroppedPieces([]);
+    setIsComplete(false);
+    setTimeTaken(0);
+    
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    timerRef.current = setInterval(() => {
+      setTimeTaken(prev => prev + 1);
+    }, 1000);
+  };
+  
   useEffect(() => {
     if (isPlaying) {
-      // Shuffle puzzle pieces
-      const shuffled = [...puzzleData]
-        .sort(() => Math.random() - 0.5)
-        .map((piece, index) => ({ ...piece, position: index + 1 }));
-      
-      setPieces(shuffled);
-      setDroppedPieces([]);
-      setIsComplete(false);
-      setTimeTaken(0);
-      
-      // Start timer
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      
-      timerRef.current = setInterval(() => {
-        setTimeTaken(prev => prev + 1);
-      }, 1000);
+      generatePuzzle(currentDifficulty);
     }
     
     return () => {
@@ -93,9 +95,8 @@ const PillarsPuzzle = () => {
         clearInterval(timerRef.current);
       }
     };
-  }, [isPlaying]);
+  }, [isPlaying, currentDifficulty]);
   
-  // Check if puzzle is complete
   useEffect(() => {
     if (droppedPieces.length === puzzleData.length) {
       const isCorrect = droppedPieces.every(piece => 
@@ -112,11 +113,10 @@ const PillarsPuzzle = () => {
         
         toast({
           title: "Puzzle Complete!",
-          description: `Well done! You completed the ${difficulty} puzzle.`,
+          description: `Well done! You completed the ${currentDifficulty} puzzle.`,
           variant: "default"
         });
       } else {
-        // Mark correct and incorrect pieces
         setDroppedPieces(prev => 
           prev.map((piece, index) => ({
             ...piece,
@@ -144,9 +144,7 @@ const PillarsPuzzle = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (draggedPiece) {
-      // Add piece to dropped pieces
       setDroppedPieces(prev => [...prev, draggedPiece]);
-      // Remove from available pieces
       setPieces(prev => prev.filter(p => p.id !== draggedPiece.id));
     }
   };
@@ -156,7 +154,6 @@ const PillarsPuzzle = () => {
   };
   
   const handlePieceClick = (piece: PuzzlePiece) => {
-    // For mobile support, simulate drag and drop with clicks
     if (pieces.includes(piece)) {
       setDroppedPieces(prev => [...prev, piece]);
       setPieces(prev => prev.filter(p => p.id !== piece.id));
@@ -164,7 +161,6 @@ const PillarsPuzzle = () => {
   };
   
   const resetPuzzle = () => {
-    // Move all pieces back to available
     const allPieces = [...pieces, ...droppedPieces];
     const shuffled = allPieces
       .sort(() => Math.random() - 0.5)
@@ -240,7 +236,6 @@ const PillarsPuzzle = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Puzzle board */}
               <div>
                 <h2 className="text-2xl font-bold mb-4">Arrange the Pillars</h2>
                 <Card 
@@ -283,7 +278,6 @@ const PillarsPuzzle = () => {
                 )}
               </div>
               
-              {/* Available pieces */}
               <div>
                 <h2 className="text-2xl font-bold mb-4">Pillar Pieces</h2>
                 <div className="space-y-3">
