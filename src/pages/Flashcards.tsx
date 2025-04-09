@@ -24,7 +24,6 @@ const Flashcards = () => {
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [learnedCount, setLearnedCount] = useState(0);
   
-  // Sample flashcard data
   const flashcardData: Flashcard[] = [
     {
       id: 1,
@@ -124,13 +123,11 @@ const Flashcards = () => {
     }
   ];
   
-  // Initialize cards
   useEffect(() => {
     setCards(flashcardData);
     setLearnedCount(0);
   }, []);
   
-  // Filter cards based on category and difficulty
   const filteredCards = cards.filter(card => {
     if (filterCategory !== 'all' && card.category !== filterCategory) return false;
     if (filterDifficulty !== 'all' && card.difficulty !== filterDifficulty) return false;
@@ -174,7 +171,6 @@ const Flashcards = () => {
         return shuffledCard || card;
       })
     );
-    // Keep the same card visible after shuffle
     if (currentCard) {
       const newIndex = shuffled.findIndex(card => card.id === currentCard.id);
       setCurrentCardIndex(newIndex >= 0 ? newIndex : 0);
@@ -205,9 +201,9 @@ const Flashcards = () => {
     } else {
       setLearnedCount(prev => prev + 1);
       toast({
-        title: "Marked as Learned!",
-        description: "Great job on memorizing this concept",
-        variant: "success"
+        title: "Card Added!",
+        description: "Your flashcard has been added to the deck.",
+        variant: "default"
       });
       nextCard();
     }
@@ -237,7 +233,6 @@ const Flashcards = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar with filters and stats */}
           <div className="w-full md:w-64 space-y-6">
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-3">Categories</h3>
@@ -334,7 +329,6 @@ const Flashcards = () => {
             </Card>
           </div>
           
-          {/* Main flashcard area */}
           <div className="flex-1">
             {currentCard ? (
               <>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -112,9 +111,9 @@ const ProphetMatch = () => {
             setGameComplete(true);
             setIsPlaying(false);
             toast({
-              title: "Game Complete!",
-              description: `You found all matches in ${moves + 1} moves and ${timeElapsed} seconds!`,
-              variant: "success"
+              title: "Match Found!",
+              description: `You matched ${prophet.name} with their miracle.`,
+              variant: "default"
             });
           }
           return newMatchedPairs;

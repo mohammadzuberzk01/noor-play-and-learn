@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -113,8 +112,8 @@ const PillarsPuzzle = () => {
         
         toast({
           title: "Puzzle Complete!",
-          description: `You completed the puzzle in ${formatTime(timeTaken)}!`,
-          variant: "success"
+          description: `Well done! You completed the ${difficulty} puzzle.`,
+          variant: "default"
         });
       } else {
         // Mark correct and incorrect pieces

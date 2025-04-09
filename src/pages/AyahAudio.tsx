@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -29,7 +28,6 @@ const AyahAudio = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Sample ayah data
   const ayahData: Ayah[] = [
     {
       id: 1,
@@ -139,11 +137,10 @@ const AyahAudio = () => {
       setScore(score + 10);
       toast({
         title: "Correct!",
-        description: "+10 points",
-        variant: "success"
+        description: `That's right! The translation of the ayah is: ${currentAyah.translation}`,
+        variant: "default"
       });
       
-      // Move to next ayah after a short delay
       setTimeout(() => {
         if (currentAyahIndex < ayahs.length - 1) {
           setCurrentAyahIndex(currentAyahIndex + 1);
@@ -166,7 +163,6 @@ const AyahAudio = () => {
         variant: "destructive"
       });
       
-      // Move to next ayah after a short delay
       setTimeout(() => {
         if (currentAyahIndex < ayahs.length - 1 && lives > 1) {
           setCurrentAyahIndex(currentAyahIndex + 1);

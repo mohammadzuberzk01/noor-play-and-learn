@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -6,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Link } from 'lucide-react';
 
 interface Verse {
   id: number;
@@ -111,7 +109,7 @@ const VerseMatch = () => {
           toast({
             title: "Correct match!",
             description: "+10 points",
-            variant: "success"
+            variant: "default"
           });
           
           // Remove matched pair from the board

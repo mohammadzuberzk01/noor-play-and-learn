@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -33,7 +32,6 @@ const WordByWord = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   
-  // Sample puzzle data
   const puzzleData: AyahPuzzle[] = [
     {
       id: 1,
@@ -76,7 +74,6 @@ const WordByWord = () => {
   
   useEffect(() => {
     if (isPlaying) {
-      // Shuffle the puzzles
       const shuffledPuzzles = [...puzzleData];
       setPuzzles(shuffledPuzzles);
       setCurrentPuzzleIndex(0);
@@ -92,7 +89,6 @@ const WordByWord = () => {
   };
   
   const handleWordSelect = (wordId: number) => {
-    // Check if word is already selected
     if (selectedWords.includes(wordId)) {
       return;
     }
@@ -102,23 +98,19 @@ const WordByWord = () => {
     
     const currentPuzzle = puzzles[currentPuzzleIndex];
     
-    // Check if all words are selected
     if (newSelectedWords.length === currentPuzzle.words.length) {
-      // Check if the order is correct
       const isOrderCorrect = newSelectedWords.every(
         (wordId, index) => wordId === currentPuzzle.wordOrder[index]
       );
       
       if (isOrderCorrect) {
-        // Order is correct
         setScore(score + 10);
         toast({
           title: "Correct!",
-          description: "Perfect order! +10 points",
-          variant: "success"
+          description: "You've built the ayah correctly!",
+          variant: "default"
         });
         
-        // Check if there are more puzzles
         if (currentPuzzleIndex < puzzles.length - 1) {
           setTimeout(() => {
             setCurrentPuzzleIndex(currentPuzzleIndex + 1);
@@ -126,7 +118,6 @@ const WordByWord = () => {
             setLevel(level + 1);
           }, 1500);
         } else {
-          // Game complete
           setIsComplete(true);
           toast({
             title: "Game Complete!",
@@ -134,14 +125,11 @@ const WordByWord = () => {
           });
         }
       } else {
-        // Order is incorrect
-        // Highlight wrong words
         const puzzleWordsWithCorrectness = currentPuzzle.words.map(word => ({
           ...word,
           isCorrect: newSelectedWords.indexOf(word.id) === currentPuzzle.wordOrder.indexOf(word.id)
         }));
         
-        // Update puzzle with correctness info
         const updatedPuzzles = [...puzzles];
         updatedPuzzles[currentPuzzleIndex] = {
           ...currentPuzzle,
@@ -155,10 +143,8 @@ const WordByWord = () => {
           variant: "destructive"
         });
         
-        // Reset after a delay
         setTimeout(() => {
           setSelectedWords([]);
-          // Reset correctness indicators
           const resetPuzzles = [...updatedPuzzles];
           resetPuzzles[currentPuzzleIndex] = puzzleData[currentPuzzleIndex];
           setPuzzles(resetPuzzles);
@@ -169,17 +155,14 @@ const WordByWord = () => {
   
   const currentPuzzle = puzzles[currentPuzzleIndex];
   
-  // Get available words (those not yet selected)
   const availableWords = currentPuzzle?.words.filter(
     word => !selectedWords.includes(word.id)
   ) || [];
   
-  // Get selected words in order of selection
   const orderedSelectedWords = currentPuzzle?.words.filter(
     word => selectedWords.includes(word.id)
   ).sort((a, b) => selectedWords.indexOf(a.id) - selectedWords.indexOf(b.id)) || [];
   
-  // Shuffle available words for display
   const shuffledAvailableWords = [...availableWords].sort(() => Math.random() - 0.5);
   
   const restartGame = () => {
@@ -235,7 +218,6 @@ const WordByWord = () => {
                 <Badge>Build the verse</Badge>
               </div>
               
-              {/* Selected Words Area */}
               <div className="min-h-24 p-4 bg-muted rounded-lg mb-6 flex flex-wrap gap-2 items-center">
                 {orderedSelectedWords.length > 0 ? (
                   orderedSelectedWords.map((word, index) => (
@@ -258,7 +240,6 @@ const WordByWord = () => {
                 )}
               </div>
               
-              {/* Available Words */}
               <div>
                 <h3 className="text-lg font-semibold mb-3">Available Words:</h3>
                 <div className="flex flex-wrap gap-3">
@@ -277,7 +258,6 @@ const WordByWord = () => {
               </div>
             </div>
             
-            {/* Word Meanings */}
             <Card className="p-4">
               <h3 className="text-lg font-semibold mb-3">Word Meanings:</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

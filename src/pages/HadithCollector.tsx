@@ -1,275 +1,259 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input, Textarea } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
-import { BookOpen, Award, Clock } from 'lucide-react';
+import { Book, PlusCircle, Check } from 'lucide-react';
 
-interface Hadith {
+interface HadithData {
   id: number;
-  text: string;
+  category: string;
+  arabic: string;
+  translation: string;
   source: string;
-  narrator: string;
-  theme: string;
-  collected: boolean;
 }
 
 const HadithCollector = () => {
-  const [hadiths, setHadiths] = useState<Hadith[]>([]);
-  const [collectionsCount, setCollectionsCount] = useState(0);
-  const [activeTab, setActiveTab] = useState('all');
-  const [timeLeft, setTimeLeft] = useState(120);
-  const [isPlaying, setIsPlaying] = useState(false);
-  
-  // Sample hadith data
-  const hadithData: Hadith[] = [
+  const [hadiths, setHadiths] = useState<HadithData[]>([]);
+  const [newHadith, setNewHadith] = useState<Omit<HadithData, 'id'>>({
+    category: '',
+    arabic: '',
+    translation: '',
+    source: ''
+  });
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [score, setScore] = useState(0);
+  const [hadithsCollected, setHadithsCollected] = useState(0);
+  const [showForm, setShowForm] = useState(false);
+
+  // Sample Hadith data
+  const sampleHadiths: HadithData[] = [
     {
       id: 1,
-      text: "None of you truly believes until he loves for his brother what he loves for himself.",
-      source: "Bukhari & Muslim",
-      narrator: "Anas ibn Malik",
-      theme: "brotherhood",
-      collected: false
+      category: "Purity",
+      arabic: "الطُّهُورُ شَطْرُ الْإِيمَانِ",
+      translation: "Purity is half of faith.",
+      source: "Sahih Muslim"
     },
     {
       id: 2,
-      text: "The most beloved actions to Allah are those performed consistently, even if they are small.",
-      source: "Bukhari & Muslim",
-      narrator: "Aisha",
-      theme: "devotion",
-      collected: false
+      category: "Knowledge",
+      arabic: "مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ",
+      translation: "Whoever takes a path upon which to obtain knowledge, Allah makes the path to Paradise easy for him.",
+      source: "Sahih Muslim"
     },
     {
       id: 3,
-      text: "Whoever believes in Allah and the Last Day should speak a good word or remain silent.",
-      source: "Bukhari & Muslim",
-      narrator: "Abu Hurairah",
-      theme: "speech",
-      collected: false
+      category: "Kindness",
+      arabic: "مَا نَقَصَتْ صَدَقَةٌ مِنْ مَالٍ",
+      translation: "Charity does not decrease wealth.",
+      source: "Sahih Muslim"
     },
     {
       id: 4,
-      text: "The strong person is not the one who overcomes people through his strength. The strong person is the one who controls himself while in anger.",
-      source: "Bukhari",
-      narrator: "Abu Hurairah",
-      theme: "self-control",
-      collected: false
+      category: "Prayer",
+      arabic: "إِذَا سَمِعْتُمُ الْمُؤَذِّنَ فَقُولُوا مِثْلَ مَا يَقُولُ",
+      translation: "When you hear the Mu'adhdhin, repeat what he says.",
+      source: "Sahih al-Bukhari"
     },
     {
       id: 5,
-      text: "A Muslim is the one from whose tongue and hands the Muslims are safe.",
-      source: "Bukhari",
-      narrator: "Abdullah ibn Amr",
-      theme: "character",
-      collected: false
-    },
-    {
-      id: 6,
-      text: "Verily, the reward of deeds depends upon the intention.",
-      source: "Bukhari & Muslim",
-      narrator: "Umar ibn Al-Khattab",
-      theme: "intention",
-      collected: false
-    },
-    {
-      id: 7,
-      text: "Seeking knowledge is an obligation upon every Muslim.",
-      source: "Ibn Majah",
-      narrator: "Anas ibn Malik",
-      theme: "knowledge",
-      collected: false
-    },
-    {
-      id: 8,
-      text: "The believer does not slander, curse, or speak in an obscene or foul manner.",
-      source: "Tirmidhi",
-      narrator: "Abdullah ibn Masud",
-      theme: "speech",
-      collected: false
-    },
-    {
-      id: 9,
-      text: "Kindness is not found in anything except that it adds to its beauty, and it is not withdrawn from anything except that it makes it defective.",
-      source: "Muslim",
-      narrator: "Aisha",
-      theme: "kindness",
-      collected: false
-    },
-    {
-      id: 10,
-      text: "Make things easy and do not make them difficult, cheer people up and do not repel them.",
-      source: "Bukhari",
-      narrator: "Anas ibn Malik",
-      theme: "kindness",
-      collected: false
+      category: "Fasting",
+      arabic: "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ",
+      translation: "Whoever fasts in Ramadan out of faith and in the hope of reward, his previous sins will be forgiven.",
+      source: "Sahih al-Bukhari"
     }
   ];
-  
-  // Initialize or shuffle hadiths
+
+  // Initialize or load hadiths
   useEffect(() => {
-    if (!isPlaying) return;
-    
-    const shuffled = [...hadithData]
-      .sort(() => Math.random() - 0.5)
-      .map(h => ({ ...h, collected: false }));
-    
-    setHadiths(shuffled);
-    setCollectionsCount(0);
-  }, [isPlaying]);
-  
-  // Timer countdown
-  useEffect(() => {
-    if (timeLeft > 0 && isPlaying) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0 && isPlaying) {
-      endGame();
+    // In a real app, this would be loaded from local storage or a database
+    setHadiths(sampleHadiths);
+    setHadithsCollected(sampleHadiths.length);
+  }, []);
+
+  // Handle input change for new hadith form
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setNewHadith(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Add new hadith to collection
+  const addHadith = () => {
+    if (!newHadith.category || !newHadith.arabic || !newHadith.translation || !newHadith.source) {
+      toast({
+        title: "Missing Fields",
+        description: "Please fill in all fields to add a new hadith.",
+        variant: "destructive"
+      });
+      return;
     }
-  }, [timeLeft, isPlaying]);
-  
-  const collectHadith = (id: number) => {
-    setHadiths(hadiths.map(h => 
-      h.id === id ? { ...h, collected: true } : h
-    ));
-    
-    setCollectionsCount(collectionsCount + 1);
-    
+
+    const newId = hadiths.length > 0 ? Math.max(...hadiths.map(h => h.id)) + 1 : 1;
+    const hadithToAdd = { id: newId, ...newHadith };
+    setHadiths([...hadiths, hadithToAdd]);
+    setHadithsCollected(hadithsCollected + 1);
+    setScore(score + 15);
+    setNewHadith({
+      category: '',
+      arabic: '',
+      translation: '',
+      source: ''
+    });
+    setShowForm(false);
     toast({
       title: "Hadith Collected!",
-      description: `${collectionsCount + 1} of ${hadiths.length} collected`,
-    });
-    
-    // Check if all hadiths are collected
-    if (collectionsCount + 1 === hadiths.length) {
-      toast({
-        title: "Mashallah!",
-        description: "You have collected all the hadiths!",
-        variant: "success"
-      });
-      endGame();
-    }
-  };
-  
-  const startGame = () => {
-    setIsPlaying(true);
-    setTimeLeft(120);
-  };
-  
-  const endGame = () => {
-    setIsPlaying(false);
-    
-    const percentage = Math.round((collectionsCount / hadiths.length) * 100);
-    
-    toast({
-      title: "Game Over!",
-      description: `You collected ${collectionsCount} of ${hadiths.length} hadiths (${percentage}%)`,
+      description: `You've added a new hadith to your collection on ${hadithToAdd.category}`,
+      variant: "default"
     });
   };
-  
-  const filteredHadiths = hadiths.filter(hadith => {
-    if (activeTab === 'all') return true;
-    if (activeTab === 'collected') return hadith.collected;
-    if (activeTab === 'uncollected') return !hadith.collected;
-    return hadith.theme === activeTab;
-  });
+
+  // Filter hadiths by category
+  const filteredHadiths = categoryFilter === 'All'
+    ? hadiths
+    : hadiths.filter(hadith => hadith.category === categoryFilter);
 
   return (
     <div className="min-h-screen flex flex-col islamic-pattern-bg">
       <Header />
-      
+
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Hadith Collector</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Hadith Collector</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Collect authentic hadiths across different themes and narrators
+            Collect authentic hadiths across various themes and build your knowledge.
           </p>
         </div>
-        
-        {!isPlaying ? (
-          <div className="max-w-lg mx-auto text-center p-8 bg-card rounded-lg shadow-md">
-            <BookOpen className="h-16 w-16 mx-auto mb-4 text-islamic-primary" />
-            <h2 className="text-2xl font-bold mb-4">Hadith Collection Challenge</h2>
-            <p className="mb-6">Explore and collect authentic hadiths within the time limit. Learn from the wisdom of the Prophet Muhammad ﷺ.</p>
-            <Button size="lg" onClick={startGame}>
-              Start Collection
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <Badge variant="outline" className="text-lg px-4 py-2 flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  <span>Collected: {collectionsCount}/{hadiths.length}</span>
+
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="md:w-3/5">
+            <Card className="p-6 mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <Badge variant="outline" className="px-3 py-1 text-base">
+                  Score: {score}
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 text-base">
+                  Hadiths: {hadithsCollected}
                 </Badge>
               </div>
-              <Badge 
-                variant="outline" 
-                className={`text-lg px-4 py-2 flex items-center gap-2 ${timeLeft < 30 ? 'bg-red-100 text-red-800' : ''}`}
-              >
-                <Clock className="h-5 w-5" />
-                <span>Time: {timeLeft}s</span>
-              </Badge>
-            </div>
-            
-            <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6">
-                <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="brotherhood">Brotherhood</TabsTrigger>
-                <TabsTrigger value="character">Character</TabsTrigger>
-                <TabsTrigger value="speech">Speech</TabsTrigger>
-                <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
-                <TabsTrigger value="collected">Collected</TabsTrigger>
-                <TabsTrigger value="uncollected">Uncollected</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value={activeTab} className="mt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredHadiths.map(hadith => (
-                    <Card 
-                      key={hadith.id}
-                      className={`p-6 transition-all ${hadith.collected ? 'bg-islamic-primary/10 border-islamic-primary' : ''}`}
-                    >
-                      <p className="text-lg mb-4">{hadith.text}</p>
-                      <div className="flex justify-between items-center mt-4">
-                        <div>
-                          <p className="text-sm font-medium">{hadith.narrator}</p>
-                          <p className="text-xs text-muted-foreground">{hadith.source}</p>
-                        </div>
-                        <div>
-                          {hadith.collected ? (
-                            <Badge className="bg-islamic-primary">Collected</Badge>
-                          ) : (
-                            <Button size="sm" onClick={() => collectHadith(hadith.id)}>
-                              Collect
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                      <Badge variant="outline" className="mt-3">{hadith.theme}</Badge>
-                    </Card>
-                  ))}
+
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold">Hadith Collection</h2>
+                <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
+                  {showForm ? "Hide Form" : "Add Hadith"}
+                  <PlusCircle className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+
+              {showForm && (
+                <div className="mb-4">
+                  <Input
+                    type="text"
+                    name="category"
+                    placeholder="Category (e.g., Prayer, Fasting)"
+                    value={newHadith.category}
+                    onChange={handleInputChange}
+                    className="mb-2"
+                  />
+                  <Textarea
+                    name="arabic"
+                    placeholder="Arabic Text"
+                    value={newHadith.arabic}
+                    onChange={handleInputChange}
+                    className="mb-2 font-arabic text-xl"
+                    dir="rtl"
+                  />
+                  <Textarea
+                    name="translation"
+                    placeholder="Translation"
+                    value={newHadith.translation}
+                    onChange={handleInputChange}
+                    className="mb-2"
+                  />
+                  <Input
+                    type="text"
+                    name="source"
+                    placeholder="Source (e.g., Sahih al-Bukhari)"
+                    value={newHadith.source}
+                    onChange={handleInputChange}
+                    className="mb-2"
+                  />
+                  <Button onClick={addHadith}>Add to Collection</Button>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </>
-        )}
-        
+              )}
+
+              <div className="space-y-3">
+                {filteredHadiths.map(hadith => (
+                  <Card key={hadith.id} className="p-4 bg-muted">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-bold text-lg">{hadith.category}</h3>
+                        <p className="text-right font-arabic text-xl">{hadith.arabic}</p>
+                      </div>
+                      <Check className="h-5 w-5 text-islamic-primary" />
+                    </div>
+                    <p className="mb-1">{hadith.translation}</p>
+                    <p className="text-sm text-muted-foreground">Source: {hadith.source}</p>
+                  </Card>
+                ))}
+                {filteredHadiths.length === 0 && (
+                  <p className="text-muted-foreground">No hadiths found in this category.</p>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          <div className="md:w-2/5">
+            <Card className="p-6 mb-6">
+              <h2 className="text-xl font-bold mb-4">Filter by Category</h2>
+              <div className="space-y-2">
+                {['All', 'Purity', 'Knowledge', 'Kindness', 'Prayer', 'Fasting'].map(category => (
+                  <Button
+                    key={category}
+                    variant={categoryFilter === category ? "default" : "outline"}
+                    className="w-full"
+                    onClick={() => setCategoryFilter(category)}
+                  >
+                    {category}
+                  </Button>
+                ))}
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center">
+                <Book className="mr-2 h-5 w-5" />
+                Why Collect Hadiths?
+              </h2>
+              <p className="mb-4">
+                Collecting hadiths is a way to preserve the teachings and practices of Prophet Muhammad (peace be upon him).
+                Each hadith provides guidance on various aspects of life, from worship to ethics.
+              </p>
+              <p>
+                By collecting and studying hadiths, you deepen your understanding of Islam and strengthen your connection
+                with the Prophet's wisdom.
+              </p>
+            </Card>
+          </div>
+        </div>
+
         <div className="mt-8 bg-muted p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">How to Play</h3>
           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Read through the hadiths and click "Collect" to add them to your collection</li>
-            <li>Try to collect all hadiths before time runs out</li>
-            <li>Use the tabs to filter hadiths by theme</li>
-            <li>Learn and reflect on the wisdom in each hadith</li>
+            <li>Collect hadiths by adding them to your collection</li>
+            <li>Filter hadiths by category to focus on specific themes</li>
+            <li>Earn points for each hadith you collect</li>
+            <li>Study the hadiths to deepen your understanding of Islam</li>
           </ul>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

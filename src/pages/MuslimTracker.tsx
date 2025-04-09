@@ -272,8 +272,8 @@ const MuslimTracker = () => {
           if (newCompleted) {
             toast({
               title: `${activity.name} Completed!`,
-              description: activity.description,
-              variant: "success"
+              description: `You've earned ${activity.points} points`,
+              variant: "default"
             });
           }
           

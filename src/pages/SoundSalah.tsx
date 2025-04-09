@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -29,7 +28,6 @@ const SoundSalah = () => {
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Sample Salah data
   const salahData: SalahTime[] = [
     {
       id: 1,
@@ -80,7 +78,6 @@ const SoundSalah = () => {
   
   useEffect(() => {
     if (isPlaying) {
-      // Shuffle the salah times for the game
       const shuffled = [...salahData]
         .map(s => ({ ...s, matched: false, selected: false }))
         .sort(() => Math.random() - 0.5);
@@ -94,7 +91,6 @@ const SoundSalah = () => {
     }
   }, [isPlaying]);
   
-  // Timer countdown
   useEffect(() => {
     if (timeLeft > 0 && isPlaying && !gameOver) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -117,32 +113,26 @@ const SoundSalah = () => {
   };
   
   const handleSalahSelect = (id: number) => {
-    // If game is over or salah already matched, ignore
     if (gameOver || salahTimes.find(s => s.id === id)?.matched) {
       return;
     }
     
-    // If another salah is already selected, compare
     if (selectedSalah !== null) {
-      // Check if same salah clicked twice
       if (selectedSalah === id) {
         return;
       }
       
-      // Update selection state for visual feedback
       setSalahTimes(prev => 
         prev.map(s => 
           s.id === id ? { ...s, selected: true } : s
         )
       );
       
-      // Both selections are made, check if Adhan matches with Salah time
       const currentSalah = salahTimes.find(s => s.id === selectedSalah);
       const selectedSalahTime = salahTimes.find(s => s.id === id);
       
       if (currentSalah && selectedSalahTime) {
         if (currentSalah.name === selectedSalahTime.name) {
-          // Correct match
           setSalahTimes(prev => 
             prev.map(s => 
               (s.id === selectedSalah || s.id === id) 
@@ -153,22 +143,19 @@ const SoundSalah = () => {
           
           setScore(score + 10);
           toast({
-            title: "Correct match!",
-            description: `${currentSalah.name} prayer time correctly matched!`,
-            variant: "success"
+            title: "Correct!",
+            description: `That's the adhan for ${selectedSalahTime.name} prayer time.`,
+            variant: "default"
           });
           
-          // Check if all times matched
           const allMatched = salahTimes.every(s => 
             s.matched || s.id === selectedSalah || s.id === id
           );
           
           if (allMatched) {
             if (round < 3) {
-              // Next round
               setTimeout(() => {
                 setRound(round + 1);
-                // Shuffle for new round
                 const shuffled = [...salahData]
                   .map(s => ({ ...s, matched: false, selected: false }))
                   .sort(() => Math.random() - 0.5);
@@ -182,7 +169,6 @@ const SoundSalah = () => {
                 });
               }, 1500);
             } else {
-              // Game complete
               setGameOver(true);
               setIsPlaying(false);
               toast({
@@ -192,14 +178,12 @@ const SoundSalah = () => {
             }
           }
         } else {
-          // Incorrect match
           toast({
             title: "Incorrect match",
             description: "That's not the right prayer time for this Adhan",
             variant: "destructive"
           });
           
-          // Reset selections after delay
           setTimeout(() => {
             setSalahTimes(prev => 
               prev.map(s => 
@@ -211,11 +195,9 @@ const SoundSalah = () => {
           }, 1000);
         }
         
-        // Reset selected salah
         setSelectedSalah(null);
       }
     } else {
-      // First selection
       setSelectedSalah(id);
       setSalahTimes(prev => 
         prev.map(s => 
@@ -223,7 +205,6 @@ const SoundSalah = () => {
         )
       );
       
-      // Play the Adhan audio
       const salah = salahTimes.find(s => s.id === id);
       if (salah) {
         playAudio(salah.audioUrl);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -27,12 +26,10 @@ const DhikrQuest = () => {
   const [dailyProgress, setDailyProgress] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   
-  // Set up local storage keys
   const STORAGE_KEY_DHIKRS = 'islamic-games-dhikr-quest-dhikrs';
   const STORAGE_KEY_STREAK = 'islamic-games-dhikr-quest-streak';
   const STORAGE_KEY_LAST_COMPLETED = 'islamic-games-dhikr-quest-last-completed';
   
-  // Sample dhikr data
   const dhikrData: Dhikr[] = [
     {
       id: 1,
@@ -136,28 +133,20 @@ const DhikrQuest = () => {
     }
   ];
   
-  // Initialize data from localStorage or default data
   useEffect(() => {
     const storedDhikrs = localStorage.getItem(STORAGE_KEY_DHIKRS);
     const storedStreak = localStorage.getItem(STORAGE_KEY_STREAK);
     const lastCompleted = localStorage.getItem(STORAGE_KEY_LAST_COMPLETED);
     
-    // Check if a day has passed since last completion
-    const today = new Date().toDateString();
     if (lastCompleted && lastCompleted !== today) {
-      // Reset counts for a new day
       setDhikrs(dhikrData.map(d => ({ ...d, count: 0 })));
       setIsComplete(false);
     } else if (storedDhikrs) {
-      // Load stored data
       setDhikrs(JSON.parse(storedDhikrs));
-      
-      // Check if all dhikrs are completed
       const storedDhikrsData = JSON.parse(storedDhikrs);
       const allComplete = storedDhikrsData.every((d: Dhikr) => d.count >= d.target);
       setIsComplete(allComplete);
     } else {
-      // Initial load
       setDhikrs(dhikrData);
     }
     
@@ -165,17 +154,14 @@ const DhikrQuest = () => {
       setStreakDays(parseInt(storedStreak, 10));
     }
     
-    // Calculate daily progress
     updateDailyProgress();
   }, []);
   
-  // Save to localStorage whenever dhikrs or streak changes
   useEffect(() => {
     if (dhikrs.length > 0) {
       localStorage.setItem(STORAGE_KEY_DHIKRS, JSON.stringify(dhikrs));
       updateDailyProgress();
       
-      // Check if all dhikrs are completed
       const allComplete = dhikrs.every(d => d.count >= d.target);
       
       if (allComplete && !isComplete) {
@@ -183,7 +169,6 @@ const DhikrQuest = () => {
         const today = new Date().toDateString();
         localStorage.setItem(STORAGE_KEY_LAST_COMPLETED, today);
         
-        // Increment streak
         const newStreak = streakDays + 1;
         setStreakDays(newStreak);
         localStorage.setItem(STORAGE_KEY_STREAK, newStreak.toString());
@@ -191,7 +176,7 @@ const DhikrQuest = () => {
         toast({
           title: "Daily Dhikr Complete!",
           description: `You've completed your daily dhikr. Current streak: ${newStreak} days!`,
-          variant: "success"
+          variant: "default"
         });
       }
     }
@@ -221,7 +206,7 @@ const DhikrQuest = () => {
       toast({
         title: "Target Reached!",
         description: `You've completed your target for "${dhikr.transliteration}"`,
-        variant: "success"
+        variant: "default"
       });
     }
   };
@@ -244,7 +229,6 @@ const DhikrQuest = () => {
     });
   };
   
-  // Filter dhikrs by category
   const filteredDhikrs = dhikrs.filter(d => d.category === activeCategory);
 
   return (
