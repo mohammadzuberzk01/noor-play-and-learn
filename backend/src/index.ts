@@ -1,11 +1,12 @@
 
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { connectDB } from './config/database';
 import { logger } from './utils/logger';
+import { seedDatabase } from './utils/seed';
 
 // Routes
 import authRoutes from './routes/auth.routes';
@@ -23,7 +24,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL || '*',
   credentials: true
 }));
 app.use(helmet());
@@ -40,27 +41,38 @@ app.use('/api/word-of-the-day', wordOfTheDayRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
 });
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI as string)
-  .then(() => {
-    logger.info('Connected to MongoDB');
+// Connect to MongoDB and start server
+const startServer = async () => {
+  try {
+    await connectDB();
     
-    // Start the server
+    // Seed database if needed (in development environment)
+    if (process.env.NODE_ENV === 'development') {
+      await seedDatabase();
+    }
+    
     app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
+      logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     });
-  })
-  .catch((error) => {
-    logger.error('MongoDB connection error:', error);
+  } catch (error) {
+    logger.error('Failed to start server:', error);
     process.exit(1);
-  });
+  }
+};
+
+startServer();
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
   logger.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  logger.error('Unhandled Rejection:', error);
   process.exit(1);
 });
