@@ -2,448 +2,573 @@
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Calendar, Star, Check, X, BookOpen, Award, RefreshCw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { Book, Calendar, Check, X } from 'lucide-react';
 
-interface WordData {
-  id: number;
+interface QuranicWord {
   word: string;
   transliteration: string;
   meaning: string;
-  rootLetters: string;
   example: {
     arabic: string;
+    transliteration: string;
     translation: string;
     reference: string;
   };
-  quiz: {
-    question: string;
-    options: string[];
-    answer: number;
-  };
-  usagePrompt: string;
+  rootLetters: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  additionalMeanings?: string[];
 }
 
-const WordOfTheDay = () => {
-  const [currentWord, setCurrentWord] = useState<WordData | null>(null);
-  const [streak, setStreak] = useState(0);
-  const [lastCompletedDate, setLastCompletedDate] = useState<string | null>(null);
-  const [quizCompleted, setQuizCompleted] = useState(false);
+const QURAN_WORDS: QuranicWord[] = [
+  {
+    word: "رَحْمَة",
+    transliteration: "rahmah",
+    meaning: "mercy",
+    example: {
+      arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+      transliteration: "Bismillāhi r-raḥmāni r-raḥīm",
+      translation: "In the name of Allah, the Most Compassionate, the Most Merciful",
+      reference: "Surah Al-Fatihah 1:1"
+    },
+    rootLetters: "ر ح م",
+    difficulty: "easy",
+    additionalMeanings: ["compassion", "kindness"]
+  },
+  {
+    word: "عِلْم",
+    transliteration: "ilm",
+    meaning: "knowledge",
+    example: {
+      arabic: "وَقُل رَّبِّ زِدْنِي عِلْمًا",
+      transliteration: "Wa qur rabbi zidnee ilma",
+      translation: "And say: My Lord, increase me in knowledge",
+      reference: "Surah Ta-Ha 20:114"
+    },
+    rootLetters: "ع ل م",
+    difficulty: "easy",
+    additionalMeanings: ["understanding", "learning"]
+  },
+  {
+    word: "صَبْر",
+    transliteration: "sabr",
+    meaning: "patience",
+    example: {
+      arabic: "وَاصْبِرْ ۚ إِنَّ اللَّهَ لَا يُضِيعُ أَجْرَ الْمُحْسِنِينَ",
+      transliteration: "Wasbir inna Allaha la yudeeAAu ajra almuhsineena",
+      translation: "And be patient. Indeed, Allah does not allow to be lost the reward of those who do good",
+      reference: "Surah Hud 11:115"
+    },
+    rootLetters: "ص ب ر",
+    difficulty: "easy",
+    additionalMeanings: ["perseverance", "endurance"]
+  },
+  {
+    word: "تَقْوَى",
+    transliteration: "taqwa",
+    meaning: "God-consciousness",
+    example: {
+      arabic: "إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ",
+      transliteration: "Inna akramakum inda Allahi atqakum",
+      translation: "Indeed, the most noble of you in the sight of Allah is the most righteous of you",
+      reference: "Surah Al-Hujurat 49:13"
+    },
+    rootLetters: "و ق ي",
+    difficulty: "medium",
+    additionalMeanings: ["piety", "righteousness", "fear of Allah"]
+  },
+  {
+    word: "إِحْسَان",
+    transliteration: "ihsan",
+    meaning: "excellence",
+    example: {
+      arabic: "إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ",
+      transliteration: "Inna Allaha yamuru bialAAadli waalihsani",
+      translation: "Indeed, Allah orders justice and good conduct",
+      reference: "Surah An-Nahl 16:90"
+    },
+    rootLetters: "ح س ن",
+    difficulty: "medium",
+    additionalMeanings: ["goodness", "perfection"]
+  },
+  {
+    word: "تَوَكُّل",
+    transliteration: "tawakkul",
+    meaning: "reliance on Allah",
+    example: {
+      arabic: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+      transliteration: "Waman yatawakkal AAala Allahi fahuwa hasbuhu",
+      translation: "And whoever relies upon Allah – then He is sufficient for him",
+      reference: "Surah At-Talaq 65:3"
+    },
+    rootLetters: "و ك ل",
+    difficulty: "medium",
+    additionalMeanings: ["trust", "dependence"]
+  },
+  {
+    word: "شُكْر",
+    transliteration: "shukr",
+    meaning: "gratitude",
+    example: {
+      arabic: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
+      transliteration: "Lain shakartum laazeedannakum",
+      translation: "If you are grateful, I will surely increase you [in favor]",
+      reference: "Surah Ibrahim 14:7"
+    },
+    rootLetters: "ش ك ر",
+    difficulty: "easy",
+    additionalMeanings: ["thankfulness", "appreciation"]
+  }
+];
+
+// Questions for quizzes
+interface Question {
+  id: number;
+  text: string;
+  options: string[];
+  correctAnswer: number;
+  wordId: number;
+}
+
+const WordOfTheDay: React.FC = () => {
+  const [todaysWord, setTodaysWord] = useState<QuranicWord | null>(null);
+  const [streak, setStreak] = useState<number>(0);
+  const [lastCompleted, setLastCompleted] = useState<string | null>(null);
+  const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [userSentence, setUserSentence] = useState('');
-  const [sentenceSubmitted, setSentenceSubmitted] = useState(false);
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [score, setScore] = useState(0);
   
-  // Sample Qur'anic words data
-  const quranicWords: WordData[] = [
-    {
-      id: 1,
-      word: "تَقْوَى",
-      transliteration: "taqwa",
-      meaning: "God-consciousness, piety",
-      rootLetters: "و-ق-ي",
-      example: {
-        arabic: "إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ",
-        translation: "Indeed, the most noble of you in the sight of Allah is the most righteous of you.",
-        reference: "Surah Al-Hujurat 49:13"
-      },
-      quiz: {
-        question: "What is the root meaning of taqwa?",
-        options: [
-          "To fear",
-          "To protect oneself",
-          "To worship",
-          "To know"
-        ],
-        answer: 1
-      },
-      usagePrompt: "Write a sentence using the concept of taqwa in your daily life."
-    },
-    {
-      id: 2,
-      word: "صَبْر",
-      transliteration: "sabr",
-      meaning: "Patience, perseverance",
-      rootLetters: "ص-ب-ر",
-      example: {
-        arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ",
-        translation: "O you who have believed, seek help through patience and prayer.",
-        reference: "Surah Al-Baqarah 2:153"
-      },
-      quiz: {
-        question: "In Islamic context, sabr refers to:",
-        options: [
-          "Being lazy",
-          "Giving up easily",
-          "Enduring difficulties with acceptance",
-          "Complaining about hardships"
-        ],
-        answer: 2
-      },
-      usagePrompt: "Describe a situation where you needed to practice sabr."
-    },
-    {
-      id: 3,
-      word: "شُكْر",
-      transliteration: "shukr",
-      meaning: "Gratitude, thankfulness",
-      rootLetters: "ش-ك-ر",
-      example: {
-        arabic: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ",
-        translation: "If you are grateful, I will surely increase you [in favor].",
-        reference: "Surah Ibrahim 14:7"
-      },
-      quiz: {
-        question: "The opposite of shukr in the Qur'an is:",
-        options: [
-          "Kufr (disbelief/ingratitude)",
-          "Sabr (patience)",
-          "Taqwa (God-consciousness)",
-          "Ihsan (excellence)"
-        ],
-        answer: 0
-      },
-      usagePrompt: "Write about something you are grateful for today using the concept of shukr."
-    },
-    {
-      id: 4,
-      word: "رَحْمَة",
-      transliteration: "rahmah",
-      meaning: "Mercy, compassion",
-      rootLetters: "ر-ح-م",
-      example: {
-        arabic: "وَمَا أَرْسَلْنَاكَ إِلَّا رَحْمَةً لِّلْعَالَمِينَ",
-        translation: "And We have not sent you, [O Muhammad], except as a mercy to the worlds.",
-        reference: "Surah Al-Anbya 21:107"
-      },
-      quiz: {
-        question: "Which of Allah's names are derived from the same root as 'rahmah'?",
-        options: [
-          "Al-Alim and Al-Hakim",
-          "Al-Rahman and Al-Rahim",
-          "Al-Aziz and Al-Jabbar",
-          "Al-Malik and Al-Quddus"
-        ],
-        answer: 1
-      },
-      usagePrompt: "Describe how you can show rahmah (mercy) to others in your community."
-    },
-    {
-      id: 5,
-      word: "هُدَى",
-      transliteration: "huda",
-      meaning: "Guidance",
-      rootLetters: "ه-د-ي",
-      example: {
-        arabic: "ذَٰلِكَ الْكِتَابُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ",
-        translation: "This is the Book about which there is no doubt, a guidance for those conscious of Allah.",
-        reference: "Surah Al-Baqarah 2:2"
-      },
-      quiz: {
-        question: "In the Qur'an, what is described as the primary source of huda (guidance)?",
-        options: [
-          "Human intellect",
-          "Cultural traditions",
-          "The Qur'an itself",
-          "Historical precedents"
-        ],
-        answer: 2
-      },
-      usagePrompt: "Reflect on a time when you felt you received guidance (huda) in making an important decision."
-    }
-  ];
-
-  // Get the current date as a string
-  const getCurrentDateString = () => {
-    const now = new Date();
-    return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-  };
-
-  // Initialize or load user data
   useEffect(() => {
-    // In a real app, this would be loaded from storage
-    const storedDate = localStorage.getItem('lastCompletedDate');
-    const storedStreak = localStorage.getItem('wordStreak');
+    // Load user data from localStorage
+    const loadUserData = () => {
+      const streakData = localStorage.getItem('wordOfDayStreak');
+      const lastCompletedData = localStorage.getItem('wordOfDayLastCompleted');
+      
+      if (streakData) setStreak(parseInt(streakData));
+      if (lastCompletedData) setLastCompleted(lastCompletedData);
+    };
     
-    if (storedDate) {
-      setLastCompletedDate(storedDate);
-    }
-    
-    if (storedStreak) {
-      setStreak(parseInt(storedStreak, 10));
-    }
-    
-    // Check if we need a new word for today
-    const today = getCurrentDateString();
-    if (storedDate !== today) {
-      // Select a word based on the current date
-      const date = new Date();
-      const wordIndex = date.getDate() % quranicWords.length;
-      setCurrentWord(quranicWords[wordIndex]);
-      setQuizCompleted(false);
-      setSentenceSubmitted(false);
-    } else {
-      // User already completed today's word
-      const wordIndex = new Date().getDate() % quranicWords.length;
-      setCurrentWord(quranicWords[wordIndex]);
-      setQuizCompleted(true);
-      setSentenceSubmitted(true);
-    }
+    loadUserData();
+    determineWord();
   }, []);
-
-  // Handle option selection in quiz
-  const handleOptionSelect = (index: number) => {
-    setSelectedOption(index);
-  };
-
-  // Submit quiz answer
-  const submitQuizAnswer = () => {
-    if (selectedOption === null || !currentWord) return;
+  
+  const determineWord = () => {
+    // Get today's date to determine the word
+    const today = new Date();
+    const dateString = today.toISOString().split('T')[0];
     
-    const isCorrect = selectedOption === currentWord.quiz.answer;
+    // Check if user already completed today's challenge
+    const completed = lastCompleted === dateString;
+    
+    // Use modulo to cycle through the words array
+    const dayOfYear = getDayOfYear(today);
+    const wordIndex = dayOfYear % QURAN_WORDS.length;
+    
+    setTodaysWord(QURAN_WORDS[wordIndex]);
+    generateQuestions(wordIndex);
+    
+    // Update streak if it's a new day
+    if (lastCompleted) {
+      const lastDate = new Date(lastCompleted);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (lastDate.toISOString().split('T')[0] !== yesterday.toISOString().split('T')[0] && 
+          lastDate.toISOString().split('T')[0] !== dateString) {
+        // Streak broken
+        setStreak(completed ? streak : 1);
+        localStorage.setItem('wordOfDayStreak', completed ? streak.toString() : '1');
+      }
+    }
+    
+    // Check if quiz was already completed today
+    if (completed) {
+      setQuizCompleted(true);
+    }
+  };
+  
+  const getDayOfYear = (date: Date): number => {
+    const start = new Date(date.getFullYear(), 0, 0);
+    const diff = date.getTime() - start.getTime();
+    const oneDay = 1000 * 60 * 60 * 24;
+    return Math.floor(diff / oneDay);
+  };
+  
+  const generateQuestions = (wordIndex: number) => {
+    const word = QURAN_WORDS[wordIndex];
+    const questions: Question[] = [
+      {
+        id: 1,
+        text: `What does "${word.word}" mean?`,
+        options: [
+          word.meaning,
+          ...getRandomMeanings(word.meaning, 3)
+        ].sort(() => Math.random() - 0.5),
+        correctAnswer: 0,
+        wordId: wordIndex
+      },
+      {
+        id: 2,
+        text: `Which of these is the correct transliteration of "${word.word}"?`,
+        options: [
+          word.transliteration,
+          ...getRandomTransliterations(word.transliteration, 3)
+        ].sort(() => Math.random() - 0.5),
+        correctAnswer: 0,
+        wordId: wordIndex
+      },
+      {
+        id: 3,
+        text: `What are the root letters of "${word.word}"?`,
+        options: [
+          word.rootLetters,
+          ...getRandomRootLetters(word.rootLetters, 3)
+        ].sort(() => Math.random() - 0.5),
+        correctAnswer: 0,
+        wordId: wordIndex
+      }
+    ];
+    
+    // Find correct answer indices after shuffling
+    questions.forEach(q => {
+      if (q.id === 1) {
+        q.correctAnswer = q.options.findIndex(o => o === word.meaning);
+      } else if (q.id === 2) {
+        q.correctAnswer = q.options.findIndex(o => o === word.transliteration);
+      } else if (q.id === 3) {
+        q.correctAnswer = q.options.findIndex(o => o === word.rootLetters);
+      }
+    });
+    
+    setQuizQuestions(questions);
+  };
+  
+  const getRandomMeanings = (correctMeaning: string, count: number): string[] => {
+    const allMeanings = QURAN_WORDS.flatMap(w => [w.meaning, ...(w.additionalMeanings || [])]);
+    const filteredMeanings = allMeanings.filter(m => m !== correctMeaning);
+    return getRandomElements(filteredMeanings, count);
+  };
+  
+  const getRandomTransliterations = (correct: string, count: number): string[] => {
+    const allTransliterations = QURAN_WORDS.map(w => w.transliteration);
+    const filtered = allTransliterations.filter(t => t !== correct);
+    return getRandomElements(filtered, count);
+  };
+  
+  const getRandomRootLetters = (correct: string, count: number): string[] => {
+    const allRoots = QURAN_WORDS.map(w => w.rootLetters);
+    const filtered = allRoots.filter(r => r !== correct);
+    return getRandomElements(filtered, count);
+  };
+  
+  const getRandomElements = (array: string[], count: number): string[] => {
+    const shuffled = [...array].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, count);
+  };
+  
+  const handleOptionSelect = (optionIndex: number) => {
+    if (isAnswered) return;
+    
+    setSelectedOption(optionIndex);
+    setIsAnswered(true);
+    
+    const currentQuestion = quizQuestions[currentQuestionIndex];
+    const isCorrect = optionIndex === currentQuestion.correctAnswer;
     
     if (isCorrect) {
+      setScore(score + 1);
       toast({
         title: "Correct!",
-        description: "You've selected the right answer.",
-        variant: "default"
+        description: "Well done!",
+        variant: "default",
       });
     } else {
       toast({
         title: "Incorrect",
-        description: `The correct answer is: ${currentWord.quiz.options[currentWord.quiz.answer]}`,
-        variant: "destructive"
+        description: `The correct answer is: ${quizQuestions[currentQuestionIndex].options[currentQuestion.correctAnswer]}`,
+        variant: "destructive",
       });
     }
     
-    setQuizCompleted(true);
-  };
-
-  // Submit user sentence
-  const submitSentence = () => {
-    if (!userSentence.trim() || !currentWord) return;
-    
-    setSentenceSubmitted(true);
-    
-    // Update streak and completion date
-    const today = getCurrentDateString();
-    setLastCompletedDate(today);
-    
-    if (lastCompletedDate) {
-      // Check if the last completion was yesterday
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayString = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-${yesterday.getDate()}`;
-      
-      if (lastCompletedDate === yesterdayString) {
-        // Maintain streak
-        const newStreak = streak + 1;
-        setStreak(newStreak);
-        localStorage.setItem('wordStreak', newStreak.toString());
-      } else if (lastCompletedDate !== today) {
-        // Reset streak if not yesterday and not today
-        setStreak(1);
-        localStorage.setItem('wordStreak', '1');
+    // Move to next question after a delay
+    setTimeout(() => {
+      if (currentQuestionIndex < quizQuestions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setSelectedOption(null);
+        setIsAnswered(false);
+      } else {
+        completeQuiz();
       }
-    } else {
-      // First time
-      setStreak(1);
-      localStorage.setItem('wordStreak', '1');
-    }
+    }, 1500);
+  };
+  
+  const completeQuiz = () => {
+    setQuizCompleted(true);
     
-    localStorage.setItem('lastCompletedDate', today);
+    // Save completion to localStorage
+    const today = new Date().toISOString().split('T')[0];
+    setLastCompleted(today);
+    localStorage.setItem('wordOfDayLastCompleted', today);
+    
+    // Update streak
+    const newStreak = streak + 1;
+    setStreak(newStreak);
+    localStorage.setItem('wordOfDayStreak', newStreak.toString());
     
     toast({
-      title: "Challenge Complete!",
-      description: `You've completed today's word challenge. Streak: ${lastCompletedDate && lastCompletedDate !== today ? streak + 1 : 1} days.`,
-      variant: "default"
+      title: "Quiz Completed!",
+      description: `You scored ${score} out of ${quizQuestions.length}`,
+      variant: "default",
     });
   };
-
+  
+  const resetQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setSelectedOption(null);
+    setIsAnswered(false);
+    setQuizCompleted(false);
+    setScore(0);
+    determineWord();
+  };
+  
   return (
     <div className="min-h-screen flex flex-col islamic-pattern-bg">
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Word of the Day Challenge</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Learn one new Qur'anic word each day and complete challenges to build your vocabulary.
+          <h1 className="text-4xl font-bold mb-4">Word of the Day Challenge</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Learn one new Qur'anic word daily and test your knowledge with quizzes.
           </p>
         </div>
         
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-3/5">
-            {currentWord && (
-              <Card className="p-6 mb-6">
-                <div className="flex justify-between items-center mb-6">
-                  <Badge variant="outline" className="px-3 py-1 text-base flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Today's Word
-                  </Badge>
-                  <Badge variant="outline" className="px-3 py-1 text-base">
-                    Streak: {streak} days
-                  </Badge>
-                </div>
-                
-                <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold mb-1 font-arabic">{currentWord.word}</h2>
-                  <p className="text-lg text-muted-foreground mb-2">{currentWord.transliteration}</p>
-                  <div className="text-xl font-medium">{currentWord.meaning}</div>
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    Root letters: {currentWord.rootLetters}
-                  </div>
-                </div>
-                
-                <div className="bg-muted p-4 rounded-lg mb-6">
-                  <h3 className="font-semibold mb-2">Example from Qur'an:</h3>
-                  <p className="text-xl text-right mb-2 font-arabic">{currentWord.example.arabic}</p>
-                  <p className="italic mb-1">{currentWord.example.translation}</p>
-                  <p className="text-sm text-muted-foreground">{currentWord.example.reference}</p>
-                </div>
-                
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">Quiz: Test Your Knowledge</h3>
-                  <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <p className="mb-3">{currentWord.quiz.question}</p>
-                    
-                    <div className="space-y-2">
-                      {currentWord.quiz.options.map((option, index) => (
-                        <div 
-                          key={index}
-                          className={`p-3 rounded-md border cursor-pointer ${
-                            quizCompleted 
-                              ? index === currentWord.quiz.answer 
-                                ? 'border-green-500 bg-green-50'
-                                : selectedOption === index
-                                  ? 'border-red-500 bg-red-50'
-                                  : 'border-gray-200'
-                              : selectedOption === index
-                                ? 'border-islamic-primary bg-islamic-primary/10'
-                                : 'border-gray-200 hover:border-islamic-primary/50'
-                          }`}
-                          onClick={() => !quizCompleted && handleOptionSelect(index)}
-                        >
-                          <div className="flex justify-between items-center">
-                            <span>{option}</span>
-                            {quizCompleted && index === currentWord.quiz.answer && (
-                              <Check className="h-5 w-5 text-green-600" />
-                            )}
-                            {quizCompleted && selectedOption === index && index !== currentWord.quiz.answer && (
-                              <X className="h-5 w-5 text-red-600" />
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {!quizCompleted && (
-                      <Button 
-                        className="mt-4 w-full"
-                        onClick={submitQuizAnswer}
-                        disabled={selectedOption === null}
-                      >
-                        Check Answer
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Usage Challenge</h3>
-                  <p className="mb-3">{currentWord.usagePrompt}</p>
-                  
-                  <div className="mb-4">
-                    <Input
-                      value={userSentence}
-                      onChange={(e) => setUserSentence(e.target.value)}
-                      placeholder="Write your response here..."
-                      disabled={sentenceSubmitted}
-                      className="mb-2"
-                    />
-                    
-                    <Button 
-                      onClick={submitSentence}
-                      disabled={!userSentence.trim() || sentenceSubmitted || !quizCompleted}
-                      className="w-full"
-                    >
-                      Submit Response
-                    </Button>
-                  </div>
-                  
-                  {sentenceSubmitted && (
-                    <div className="p-3 bg-green-100 text-green-800 rounded-md">
-                      <Check className="inline-block h-5 w-5 mr-1" />
-                      <span>Challenge completed! Come back tomorrow for a new word.</span>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            )}
-          </div>
+        <div className="flex justify-between items-center mb-6">
+          <Badge variant="outline" className="flex items-center gap-2 px-3 py-2 text-base">
+            <Calendar className="h-5 w-5" />
+            <span>Today's Word</span>
+          </Badge>
           
-          <div className="md:w-2/5">
-            <Card className="p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center">
-                <Book className="mr-2 h-5 w-5" />
-                Why Learn Qur'anic Vocabulary?
-              </h2>
-              <p className="mb-4">
-                The Qur'an contains approximately 77,430 words, but the unique word count is 
-                much smaller. Learning just 300 words can help you understand about 70% of the 
-                Qur'an's frequently used words!
-              </p>
-              <p>
-                By learning one new word each day, within a year you'll have a strong foundation 
-                for understanding the Qur'an in its original language. This daily practice helps 
-                build a deeper connection with the divine text.
-              </p>
-            </Card>
-            
-            <Card className="p-6">
-              <h2 className="text-xl font-bold mb-4">Your Progress</h2>
-              <div className="space-y-3">
-                <div>
-                  <p className="font-medium text-muted-foreground">Current Streak</p>
-                  <p className="text-2xl font-bold">{streak} days</p>
-                </div>
-                
-                <div>
-                  <p className="font-medium text-muted-foreground">Today's Status</p>
-                  <p className="font-medium">
-                    {lastCompletedDate === getCurrentDateString() 
-                      ? "Completed" 
-                      : "Not yet completed"}
-                  </p>
-                </div>
-                
-                <div className="pt-2">
-                  <p className="text-muted-foreground mb-2">Completion Status:</p>
-                  <div className="flex gap-2 mb-1">
-                    <Badge variant={quizCompleted ? "default" : "outline"} className="flex-1 justify-center">
-                      Quiz {quizCompleted ? "✓" : "○"}
-                    </Badge>
-                    <Badge variant={sentenceSubmitted ? "default" : "outline"} className="flex-1 justify-center">
-                      Usage {sentenceSubmitted ? "✓" : "○"}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
+          <Badge variant="outline" className="flex items-center gap-2 px-3 py-2 text-base">
+            <Star className="h-5 w-5 text-amber-500" />
+            <span>Streak: {streak} days</span>
+          </Badge>
         </div>
         
+        {todaysWord && (
+          <Tabs defaultValue="learn" className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="learn">Learn</TabsTrigger>
+              <TabsTrigger value="quiz" disabled={quizCompleted}>
+                Quiz
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="learn">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Learn Today's Word</CardTitle>
+                    <Badge>{todaysWord.difficulty}</Badge>
+                  </div>
+                  <CardDescription>
+                    Expand your Qur'anic vocabulary one word at a time
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent className="space-y-6">
+                  <div className="bg-muted p-6 rounded-lg text-center">
+                    <h2 className="text-3xl font-bold mb-2 font-arabic">{todaysWord.word}</h2>
+                    <p className="text-xl mb-2">{todaysWord.transliteration}</p>
+                    <p className="text-2xl text-islamic-primary font-medium">{todaysWord.meaning}</p>
+                    
+                    {todaysWord.additionalMeanings && todaysWord.additionalMeanings.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2 justify-center">
+                        {todaysWord.additionalMeanings.map((meaning, index) => (
+                          <Badge key={index} variant="outline">{meaning}</Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Root Letters</h3>
+                    <div className="flex gap-3 justify-center">
+                      {todaysWord.rootLetters.split(' ').map((letter, index) => (
+                        <Badge key={index} className="text-xl px-3 py-2 bg-islamic-primary/20">{letter}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2">Example from Qur'an</h3>
+                    <Alert>
+                      <div className="text-center space-y-3">
+                        <p className="text-xl font-arabic">{todaysWord.example.arabic}</p>
+                        <p className="italic">{todaysWord.example.transliteration}</p>
+                        <AlertDescription>
+                          "{todaysWord.example.translation}"
+                        </AlertDescription>
+                        <AlertTitle className="text-sm text-muted-foreground">
+                          {todaysWord.example.reference}
+                        </AlertTitle>
+                      </div>
+                    </Alert>
+                  </div>
+                  
+                  {!quizCompleted ? (
+                    <Button 
+                      className="w-full" 
+                      onClick={() => document.querySelector('[value="quiz"]')?.dispatchEvent(new MouseEvent('click'))}
+                    >
+                      Take Quiz
+                    </Button>
+                  ) : (
+                    <Alert className="bg-green-50 border-green-200">
+                      <Check className="h-5 w-5 text-green-600" />
+                      <AlertTitle>Completed!</AlertTitle>
+                      <AlertDescription>
+                        You've completed today's word challenge. Come back tomorrow for a new word!
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="quiz">
+              {!quizCompleted ? (
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Test Your Knowledge</CardTitle>
+                      <Badge variant="outline">Question {currentQuestionIndex + 1}/{quizQuestions.length}</Badge>
+                    </div>
+                    <CardDescription>
+                      Answer questions about today's word to strengthen your memory
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    {quizQuestions.length > 0 && (
+                      <>
+                        <div className="mb-6">
+                          <h3 className="text-lg font-semibold mb-4">
+                            {quizQuestions[currentQuestionIndex].text}
+                          </h3>
+                          
+                          <div className="grid gap-3">
+                            {quizQuestions[currentQuestionIndex].options.map((option, index) => (
+                              <Button
+                                key={index}
+                                variant={
+                                  isAnswered
+                                    ? index === quizQuestions[currentQuestionIndex].correctAnswer
+                                      ? "default"
+                                      : index === selectedOption
+                                        ? "destructive"
+                                        : "outline"
+                                    : "outline"
+                                }
+                                className={`justify-start h-auto p-4 ${
+                                  isAnswered 
+                                    ? index === quizQuestions[currentQuestionIndex].correctAnswer
+                                      ? "bg-green-500 hover:bg-green-500"
+                                      : index === selectedOption
+                                        ? "bg-red-500 hover:bg-red-500"
+                                        : ""
+                                    : "hover:bg-islamic-primary/10"
+                                }`}
+                                onClick={() => handleOptionSelect(index)}
+                                disabled={isAnswered}
+                              >
+                                {option}
+                                {isAnswered && index === quizQuestions[currentQuestionIndex].correctAnswer && (
+                                  <Check className="ml-auto h-5 w-5" />
+                                )}
+                                {isAnswered && index === selectedOption && index !== quizQuestions[currentQuestionIndex].correctAnswer && (
+                                  <X className="ml-auto h-5 w-5" />
+                                )}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Quiz Completed!</CardTitle>
+                    <CardDescription>
+                      You've completed today's word challenge
+                    </CardDescription>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-6">
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <h3 className="text-2xl font-bold mb-2">Your Score</h3>
+                      <div className="text-4xl font-bold text-islamic-primary mb-4">
+                        {score} / {quizQuestions.length}
+                      </div>
+                      
+                      <div className="flex justify-center items-center gap-2">
+                        <Star className="h-6 w-6 text-amber-500" />
+                        <span className="text-xl font-semibold">Daily Streak: {streak}</span>
+                        <Star className="h-6 w-6 text-amber-500" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-4 justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={resetQuiz}
+                        className="flex items-center gap-2"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                        Practice Again
+                      </Button>
+                      
+                      <Button
+                        onClick={() => document.querySelector('[value="learn"]')?.dispatchEvent(new MouseEvent('click'))}
+                        className="flex items-center gap-2"
+                      >
+                        <BookOpen className="h-4 w-4" />
+                        Review Word
+                      </Button>
+                    </div>
+                    
+                    <Alert>
+                      <Award className="h-5 w-5" />
+                      <AlertTitle>Great job!</AlertTitle>
+                      <AlertDescription>
+                        Come back tomorrow for a new word to continue your learning streak!
+                      </AlertDescription>
+                    </Alert>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
+        
         <div className="mt-8 bg-muted p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">How It Works</h3>
+          <h3 className="text-lg font-semibold mb-2">About Word of the Day</h3>
           <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-            <li>Each day you'll get a new Qur'anic word to learn</li>
-            <li>Complete the quiz to test your understanding</li>
-            <li>Write a sentence or reflection using the word</li>
-            <li>Build a streak by completing the challenge daily</li>
-            <li>Review previously learned words to reinforce your vocabulary</li>
+            <li>Each day features a new word from the Qur'an with its meaning and context</li>
+            <li>Complete daily quizzes to test your understanding</li>
+            <li>Build a streak by returning each day for a new word</li>
+            <li>Learn the most common and important Qur'anic vocabulary</li>
+            <li>See how the word is used in context with examples from the Qur'an</li>
           </ul>
         </div>
       </main>
