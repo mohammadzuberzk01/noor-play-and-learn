@@ -7,6 +7,7 @@ import ProphetMatch from './pages/ProphetMatch';
 import QuizDuel from './pages/QuizDuel';
 import QuranicWordBingo from './pages/QuranicWordBingo';
 import WordOfTheDay from './pages/WordOfTheDay';
+import WordSearch from './pages/WordSearch';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/games/quiz-duel" element={<QuizDuel />} />
           <Route path="/games/quranic-word-bingo" element={<QuranicWordBingo />} />
           <Route path="/games/word-of-the-day" element={<WordOfTheDay />} />
+          <Route path="/games/word-search" element={<WordSearch />} />
         </Routes>
       </ThemeProvider>
     </BrowserRouter>
