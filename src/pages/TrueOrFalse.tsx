@@ -6,16 +6,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, AlertTriangle, Shuffle, Timer } from 'lucide-react';
 import { toast } from 'sonner';
+import { trueOrFalseService } from '@/services/api';
+import { useQuery } from '@tanstack/react-query';
 
 interface Question {
-  id: number;
+  _id: string;
   text: string;
   isTrue: boolean;
   explanation: string;
+  difficulty: string;
 }
 
 const TrueOrFalse = () => {
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [answer, setAnswer] = useState<boolean | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -24,75 +26,16 @@ const TrueOrFalse = () => {
   const [timeLeft, setTimeLeft] = useState(15);
   const [gameActive, setGameActive] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [difficulty, setDifficulty] = useState<string | undefined>(undefined);
   
-  const questionsData: Question[] = [
-    {
-      id: 1,
-      text: "Friday prayer (Jumu'ah) is obligatory for all Muslims, including women and children.",
-      isTrue: false,
-      explanation: "Friday prayer is obligatory for adult male Muslims who are not sick, traveling, or have valid excuses. It is not obligatory for women, children, travelers, or the sick, though they may attend."
-    },
-    {
-      id: 2,
-      text: "The Quran has 114 surahs (chapters).",
-      isTrue: true,
-      explanation: "The Quran consists of 114 surahs (chapters) of varying lengths."
-    },
-    {
-      id: 3,
-      text: "Zakat (obligatory charity) is always 2.5% of one's wealth regardless of the type of wealth.",
-      isTrue: false,
-      explanation: "The zakat rate varies based on the type of wealth. While 2.5% applies to money and trade goods, agricultural produce has different rates (5-10%), and livestock has its own calculation system."
-    },
-    {
-      id: 4,
-      text: "Zamzam water comes from a well located in Madinah.",
-      isTrue: false,
-      explanation: "Zamzam water comes from a well located in Makkah near the Kaaba, not in Madinah."
-    },
-    {
-      id: 5,
-      text: "The Islamic calendar is a lunar calendar with 12 months.",
-      isTrue: true,
-      explanation: "The Islamic (Hijri) calendar is based on lunar months and consists of 12 months in a year."
-    },
-    {
-      id: 6,
-      text: "The first revelation of the Quran to Prophet Muhammad (PBUH) happened in the cave of Thawr.",
-      isTrue: false,
-      explanation: "The first revelation came to Prophet Muhammad (PBUH) in the cave of Hira (not Thawr) on Mount Nur, near Makkah."
-    },
-    {
-      id: 7,
-      text: "Muslims are required to make Hajj (pilgrimage) every year if they are able.",
-      isTrue: false,
-      explanation: "Hajj is obligatory only once in a lifetime for Muslims who are physically and financially able to perform it."
-    },
-    {
-      id: 8,
-      text: "The Quran was revealed over a period of approximately 23 years.",
-      isTrue: true,
-      explanation: "The Quran was revealed gradually over approximately 23 years of Prophet Muhammad's (PBUH) prophethood."
-    },
-    {
-      id: 9,
-      text: "All angels in Islam have free will, similar to humans.",
-      isTrue: false,
-      explanation: "According to Islamic belief, angels do not have free will. They obey Allah's commands without question."
-    },
-    {
-      id: 10,
-      text: "The five daily prayers became obligatory after the Prophet's Night Journey (Isra and Mi'raj).",
-      isTrue: true,
-      explanation: "The five daily prayers were made obligatory for Muslims during the Prophet's Night Journey (Isra and Mi'raj)."
-    }
-  ];
+  // Fetch questions from API
+  const { data: questionsData, isLoading, error, refetch } = useQuery({
+    queryKey: ['trueOrFalseQuestions', difficulty],
+    queryFn: () => trueOrFalseService.getRandomQuestions(10, difficulty),
+    enabled: false, // Don't fetch automatically
+  });
   
-  useEffect(() => {
-    // Shuffle questions and set initial state
-    const shuffled = [...questionsData].sort(() => Math.random() - 0.5);
-    setQuestions(shuffled);
-  }, []);
+  const questions = questionsData?.data || [];
   
   useEffect(() => {
     // Set current question when questions are loaded or index changes
@@ -119,7 +62,7 @@ const TrueOrFalse = () => {
     };
   }, [gameActive, timeLeft, showExplanation, gameOver]);
   
-  const startGame = () => {
+  const startGame = async (selectedDifficulty?: string) => {
     setScore(0);
     setQuestionIndex(0);
     setShowExplanation(false);
@@ -127,10 +70,15 @@ const TrueOrFalse = () => {
     setGameActive(true);
     setGameOver(false);
     setTimeLeft(15);
+    setDifficulty(selectedDifficulty);
     
-    // Re-shuffle questions
-    const shuffled = [...questionsData].sort(() => Math.random() - 0.5);
-    setQuestions(shuffled);
+    // Fetch new questions
+    try {
+      await refetch();
+    } catch (error) {
+      toast.error("Failed to load questions. Please try again.");
+      setGameActive(false);
+    }
   };
   
   const handleAnswer = (userAnswer: boolean | null) => {
@@ -186,13 +134,35 @@ const TrueOrFalse = () => {
               <li>• Learn the correct answer with an explanation</li>
               <li>• Try to get as many correct answers as possible</li>
             </ul>
-            <Button onClick={startGame} size="lg" className="mt-4">
-              Start Game
+            
+            <div className="space-y-3">
+              <h3 className="font-semibold">Select Difficulty</h3>
+              <div className="flex justify-center gap-3 mb-4">
+                <Button onClick={() => startGame('easy')} variant="outline" size="sm">Easy</Button>
+                <Button onClick={() => startGame('medium')} variant="outline" size="sm">Medium</Button>
+                <Button onClick={() => startGame('hard')} variant="outline" size="sm">Hard</Button>
+                <Button onClick={() => startGame()} size="sm">Random</Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {isLoading && gameActive && (
+          <div className="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6 text-center">
+            <p>Loading questions...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-6 text-center">
+            <p>Failed to load questions. Please try again.</p>
+            <Button onClick={() => startGame(difficulty)} size="sm" className="mt-4">
+              Retry
             </Button>
           </div>
         )}
         
-        {gameActive && currentQuestion && (
+        {gameActive && currentQuestion && !isLoading && (
           <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="bg-islamic-primary text-white p-6">
               <div className="flex justify-between items-center mb-4">
@@ -275,7 +245,7 @@ const TrueOrFalse = () => {
             </div>
             
             <Button 
-              onClick={startGame} 
+              onClick={() => startGame(difficulty)} 
               size="lg" 
               className="flex items-center gap-2"
             >

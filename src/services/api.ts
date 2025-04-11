@@ -80,6 +80,41 @@ export const gameService = {
   }
 };
 
+// Questions by game type
+export const questionService = {
+  getQuestions: async (gameSlug: string, params?: { difficulty?: string; limit?: number; offset?: number }) => {
+    const response = await apiClient.get(`/games/${gameSlug}/questions`, { params });
+    return response.data;
+  },
+  
+  getRandomQuestions: async (gameSlug: string, params?: { count?: number; difficulty?: string }) => {
+    const response = await apiClient.get(`/games/${gameSlug}/questions/random`, { params });
+    return response.data;
+  },
+  
+  getQuestion: async (gameSlug: string, questionId: string) => {
+    const response = await apiClient.get(`/games/${gameSlug}/questions/${questionId}`);
+    return response.data;
+  },
+  
+  createQuestion: async (gameSlug: string, questionData: any) => {
+    const response = await apiClient.post(`/games/${gameSlug}/questions`, questionData);
+    return response.data;
+  },
+  
+  updateQuestion: async (gameSlug: string, questionId: string, questionData: any) => {
+    const response = await apiClient.put(`/games/${gameSlug}/questions/${questionId}`, questionData);
+    return response.data;
+  },
+  
+  deleteQuestion: async (gameSlug: string, questionId: string, questionType: string) => {
+    const response = await apiClient.delete(`/games/${gameSlug}/questions/${questionId}`, {
+      data: { questionType }
+    });
+    return response.data;
+  }
+};
+
 // User Progress
 export const progressService = {
   getUserProgress: async () => {
@@ -108,6 +143,28 @@ export const wordOfTheDayService = {
   getWordByDate: async (date: string) => {
     const response = await apiClient.get(`/word-of-the-day/date/${date}`);
     return response.data;
+  }
+};
+
+// Game specific services - True or False
+export const trueOrFalseService = {
+  getQuestions: async (params?: { difficulty?: string; limit?: number }) => {
+    return questionService.getQuestions('true-or-false', params);
+  },
+  
+  getRandomQuestions: async (count: number = 10, difficulty?: string) => {
+    return questionService.getRandomQuestions('true-or-false', { count, difficulty });
+  }
+};
+
+// Game specific services - Word Search
+export const wordSearchService = {
+  getQuestions: async (params?: { difficulty?: string; limit?: number }) => {
+    return questionService.getQuestions('word-search', params);
+  },
+  
+  getRandomQuestions: async (count: number = 1, difficulty?: string) => {
+    return questionService.getRandomQuestions('word-search', { count, difficulty });
   }
 };
 

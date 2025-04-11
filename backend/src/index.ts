@@ -14,6 +14,7 @@ import userRoutes from './routes/user.routes';
 import gameRoutes from './routes/game.routes';
 import progressRoutes from './routes/progress.routes';
 import wordOfTheDayRoutes from './routes/wordOfTheDay.routes';
+import questionRoutes from './routes/question.routes';
 
 // Load environment variables
 dotenv.config();
@@ -38,6 +39,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/word-of-the-day', wordOfTheDayRoutes);
+app.use('/api/games', questionRoutes); // Use the game route prefix
 
 // Health check
 app.get('/health', (req, res) => {

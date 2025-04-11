@@ -6,6 +6,7 @@ export interface IGame extends Document {
   description: string;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
+  gameType: 'true-false' | 'multiple-choice' | 'matching' | 'word-search' | 'other';
   slug: string;
   iconName: string;
   isActive: boolean;
@@ -35,6 +36,12 @@ const GameSchema = new Schema<IGame>(
       type: String,
       required: [true, 'Game category is required'],
       trim: true,
+    },
+    gameType: {
+      type: String,
+      enum: ['true-false', 'multiple-choice', 'matching', 'word-search', 'other'],
+      default: 'other',
+      required: [true, 'Game type is required'],
     },
     slug: {
       type: String,
