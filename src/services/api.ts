@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 // Create an axios instance
@@ -117,10 +116,16 @@ export const questionService = {
 export const gameQuestionServices = {
   // Knowledge-based games
   trueFalse: {
-    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
-      questionService.getQuestions('true-or-false', params),
-    getRandomQuestions: (count: number = 10, difficulty?: string) => 
-      questionService.getRandomQuestions('true-or-false', { count, difficulty }),
+    getQuestions: (gameSlug = 'true-or-false', params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions(gameSlug, params),
+    getRandomQuestions: (gameSlug = 'true-or-false', count: number = 10, difficulty?: string) => 
+      questionService.getRandomQuestions(gameSlug, { count, difficulty }),
+    createQuestion: (gameSlug = 'true-or-false', questionData: any) =>
+      questionService.createQuestion(gameSlug, questionData),
+    updateQuestion: (gameSlug = 'true-or-false', questionId: string, questionData: any) =>
+      questionService.updateQuestion(gameSlug, questionId, questionData),
+    deleteQuestion: (gameSlug = 'true-or-false', questionId: string) =>
+      questionService.deleteQuestion(gameSlug, questionId)
   },
   
   fiqhMastermind: {
@@ -186,6 +191,12 @@ export const gameQuestionServices = {
         questionService.getQuestions(gameSlug, params),
       getRandomQuestions: (count: number = 10, difficulty?: string) => 
         questionService.getRandomQuestions(gameSlug, { count, difficulty }),
+      createQuestion: (questionData: any) =>
+        questionService.createQuestion(gameSlug, questionData),
+      updateQuestion: (questionId: string, questionData: any) =>
+        questionService.updateQuestion(gameSlug, questionId, questionData),
+      deleteQuestion: (questionId: string) =>
+        questionService.deleteQuestion(gameSlug, questionId)
     };
   }
 };

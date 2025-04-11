@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate, Link, Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  GameController, 
+  GamepadIcon, 
   LogOut, 
   Menu, 
   X,
@@ -78,7 +78,7 @@ const AdminLayout = () => {
               to="/admin/games" 
               className="flex items-center rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-islamic-primary"
             >
-              <GameController className="mr-3 h-5 w-5" />
+              <GamepadIcon className="mr-3 h-5 w-5" />
               Games
             </Link>
             

@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider"
@@ -10,7 +11,7 @@ import WordOfTheDay from './pages/WordOfTheDay';
 import WordSearch from './pages/WordSearch';
 import TrueOrFalse from './pages/TrueOrFalse';
 import AdminRoutes from './routes/AdminRoutes';
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from '@/components/ui/toaster';
 
 // Create a client
 const queryClient = new QueryClient({

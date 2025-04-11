@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { gameQuestionServices } from '@/services/api';
+import { gameQuestionServices, questionService } from '@/services/api';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -62,8 +61,8 @@ const QuestionManagement = () => {
     queryKey: ['adminGameQuestions', gameSlug, difficulty],
     queryFn: () => {
       // In a real app, this would be a real API call
-      if (gameType === 'true-false') {
-        return gameQuestionServices.trueFalse.getQuestions(gameSlug!, { difficulty, limit: 100 });
+      if (gameType === 'true-false' && gameSlug) {
+        return questionService.getQuestions(gameSlug, { difficulty, limit: 100 });
       }
       // Add handlers for other game types here
       return Promise.resolve({ data: [] });
@@ -83,11 +82,12 @@ const QuestionManagement = () => {
   
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      if (!gameSlug) return;
+      
       if (editingQuestion) {
         // Update existing question
-        // In a real app, this would be a real API call
-        await gameQuestionServices.trueFalse.updateQuestion(
-          gameSlug!, 
+        await questionService.updateQuestion(
+          gameSlug, 
           editingQuestion._id, 
           values
         );
@@ -97,8 +97,7 @@ const QuestionManagement = () => {
         });
       } else {
         // Create new question
-        // In a real app, this would be a real API call
-        await gameQuestionServices.trueFalse.createQuestion(gameSlug!, values);
+        await questionService.createQuestion(gameSlug, values);
         toast({
           title: "Question created",
           description: "The question has been created successfully",
@@ -134,10 +133,11 @@ const QuestionManagement = () => {
   };
   
   const handleDelete = async (questionId: string) => {
+    if (!gameSlug) return;
+    
     if (window.confirm("Are you sure you want to delete this question?")) {
       try {
-        // In a real app, this would be a real API call
-        await gameQuestionServices.trueFalse.deleteQuestion(gameSlug!, questionId);
+        await questionService.deleteQuestion(gameSlug, questionId);
         toast({
           title: "Question deleted",
           description: "The question has been deleted successfully",
