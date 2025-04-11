@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/database';
 import { logger } from './utils/logger';
 import { seedDatabase } from './utils/seed';
+import { advancedSeedDatabase } from './utils/advanced-seed';
 
 // Routes
 import authRoutes from './routes/auth.routes';
@@ -53,7 +54,11 @@ const startServer = async () => {
     
     // Seed database if needed (in development environment)
     if (process.env.NODE_ENV === 'development') {
+      // Use basic seeding for minimal data
       await seedDatabase();
+      
+      // Use advanced seeding for more comprehensive data
+      await advancedSeedDatabase();
     }
     
     app.listen(PORT, () => {

@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { gameQuestionServices, questionService } from '@/services/api';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { questionService } from '@/services/api';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ const QuestionManagement = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const gameType = location.state?.gameType || 'true-false';
   const [searchTerm, setSearchTerm] = useState('');
   const [difficulty, setDifficulty] = useState<string | undefined>(undefined);
@@ -56,16 +58,67 @@ const QuestionManagement = () => {
   const { 
     data: questionsData, 
     isLoading,
-    refetch 
+    error
   } = useQuery({
     queryKey: ['adminGameQuestions', gameSlug, difficulty],
     queryFn: () => {
-      // In a real app, this would be a real API call
-      if (gameType === 'true-false' && gameSlug) {
-        return questionService.getQuestions(gameSlug, { difficulty, limit: 100 });
+      if (!gameSlug) return Promise.resolve({ data: [] });
+      return questionService.getQuestions(gameSlug, { difficulty, limit: 100 });
+    },
+    enabled: !!gameSlug
+  });
+  
+  // Create mutation for adding/updating questions
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) => {
+      if (!gameSlug) throw new Error("Game slug is required");
+      
+      if (editingQuestion) {
+        return questionService.updateQuestion(gameSlug, editingQuestion._id, values);
+      } else {
+        return questionService.createQuestion(gameSlug, values);
       }
-      // Add handlers for other game types here
-      return Promise.resolve({ data: [] });
+    },
+    onSuccess: () => {
+      toast({
+        title: editingQuestion ? "Question updated" : "Question created",
+        description: editingQuestion 
+          ? "The question has been updated successfully" 
+          : "The question has been created successfully",
+      });
+      setIsDialogOpen(false);
+      setEditingQuestion(null);
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ['adminGameQuestions', gameSlug] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `An error occurred: ${(error as Error).message}`,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Delete question mutation
+  const deleteMutation = useMutation({
+    mutationFn: (questionId: string) => {
+      if (!gameSlug) throw new Error("Game slug is required");
+      return questionService.deleteQuestion(gameSlug, questionId);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Question deleted",
+        description: "The question has been deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['adminGameQuestions', gameSlug] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `An error occurred: ${(error as Error).message}`,
+        variant: "destructive",
+      });
     }
   });
   
@@ -81,43 +134,7 @@ const QuestionManagement = () => {
   });
   
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      if (!gameSlug) return;
-      
-      if (editingQuestion) {
-        // Update existing question
-        await questionService.updateQuestion(
-          gameSlug, 
-          editingQuestion._id, 
-          values
-        );
-        toast({
-          title: "Question updated",
-          description: "The question has been updated successfully",
-        });
-      } else {
-        // Create new question
-        await questionService.createQuestion(gameSlug, values);
-        toast({
-          title: "Question created",
-          description: "The question has been created successfully",
-        });
-      }
-      
-      // Close dialog and reset form
-      setIsDialogOpen(false);
-      setEditingQuestion(null);
-      form.reset();
-      
-      // Refetch questions
-      refetch();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred while saving the question",
-        variant: "destructive",
-      });
-    }
+    mutation.mutate(values);
   };
   
   const handleEdit = (question: any) => {
@@ -133,23 +150,8 @@ const QuestionManagement = () => {
   };
   
   const handleDelete = async (questionId: string) => {
-    if (!gameSlug) return;
-    
     if (window.confirm("Are you sure you want to delete this question?")) {
-      try {
-        await questionService.deleteQuestion(gameSlug, questionId);
-        toast({
-          title: "Question deleted",
-          description: "The question has been deleted successfully",
-        });
-        refetch();
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "An error occurred while deleting the question",
-          variant: "destructive",
-        });
-      }
+      deleteMutation.mutate(questionId);
     }
   };
   
@@ -268,8 +270,8 @@ const QuestionManagement = () => {
             />
             
             <DialogFooter>
-              <Button type="submit">
-                {editingQuestion ? 'Update Question' : 'Create Question'}
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending ? 'Saving...' : editingQuestion ? 'Update Question' : 'Create Question'}
               </Button>
             </DialogFooter>
           </form>
@@ -312,6 +314,7 @@ const QuestionManagement = () => {
               variant="destructive" 
               size="sm"
               onClick={() => handleDelete(question._id)}
+              disabled={deleteMutation.isPending}
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -321,8 +324,16 @@ const QuestionManagement = () => {
     }
     
     // Add renderers for other question types here
-    return <TableRow><TableCell colSpan={4}>No questions available</TableCell></TableRow>;
+    return <TableRow><TableCell colSpan={4} className="text-center">No questions available</TableCell></TableRow>;
   };
+  
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 text-red-700 rounded-md">
+        Error loading questions: {(error as Error).message}
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6">

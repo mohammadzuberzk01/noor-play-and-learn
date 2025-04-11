@@ -5,6 +5,7 @@ import AdminLayout from '@/components/layout/AdminLayout';
 import AdminLogin from '@/pages/admin/Login';
 import Dashboard from '@/pages/admin/Dashboard';
 import Games from '@/pages/admin/Games';
+import EditGame from '@/pages/admin/EditGame';
 import Users from '@/pages/admin/Users';
 import QuestionManagement from '@/pages/admin/QuestionManagement';
 
@@ -16,6 +17,7 @@ const AdminRoutes = () => {
         <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="games" element={<Games />} />
+        <Route path="games/edit/:id" element={<EditGame />} />
         <Route path="users" element={<Users />} />
         <Route path="games/:gameSlug/questions" element={<QuestionManagement />} />
       </Route>

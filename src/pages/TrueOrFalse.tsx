@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { gameQuestionServices } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
@@ -14,7 +15,7 @@ const TrueOrFalse = () => {
   const [showExplanation, setShowExplanation] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
 
-  const questions = questionsData || [];
+  const questions = questionsData?.data || [];
   const currentQuestion = questions[currentQuestionIndex];
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const TrueOrFalse = () => {
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>Error: {(error as Error).message}</div>;
   }
 
   if (gameFinished) {

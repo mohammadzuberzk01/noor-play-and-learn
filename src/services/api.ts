@@ -12,7 +12,7 @@ const apiClient = axios.create({
 // Add request interceptor to add auth token to requests
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,6 +33,7 @@ apiClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      localStorage.removeItem('adminToken');
       // Redirect to login page if needed
       // window.location.href = '/login';
     }
@@ -56,9 +57,23 @@ export const authService = {
     return response.data;
   },
   
+  adminLogin: async (credentials: { email: string; password: string }) => {
+    const response = await apiClient.post('/auth/admin/login', credentials);
+    if (response.data.token) {
+      localStorage.setItem('adminToken', response.data.token);
+      localStorage.setItem('admin', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  },
+  
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+  },
+  
+  adminLogout: () => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('admin');
   },
   
   getCurrentUser: async () => {
@@ -76,6 +91,26 @@ export const gameService = {
   
   getGameBySlug: async (slug: string) => {
     const response = await apiClient.get(`/games/${slug}`);
+    return response.data;
+  },
+  
+  getGameById: async (id: string) => {
+    const response = await apiClient.get(`/games/${id}`);
+    return response.data;
+  },
+  
+  createGame: async (gameData: any) => {
+    const response = await apiClient.post('/games', gameData);
+    return response.data;
+  },
+  
+  updateGame: async (id: string, gameData: any) => {
+    const response = await apiClient.put(`/games/${id}`, gameData);
+    return response.data;
+  },
+  
+  deleteGame: async (id: string) => {
+    const response = await apiClient.delete(`/games/${id}`);
     return response.data;
   }
 };

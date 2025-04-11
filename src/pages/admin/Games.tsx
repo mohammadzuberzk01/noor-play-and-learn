@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gameQuestionServices } from '@/services/api';
+import { gameService } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,35 +16,25 @@ interface GameType {
   slug: string;
   gameType: string;
   iconName: string;
-  questionCount: number;
+  questionCount?: number;
+  isActive: boolean;
+  comingSoon: boolean;
 }
 
 const Games = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   
-  // In a real app, fetch games from API
+  // Fetch games from API
   const { data: gamesData, isLoading } = useQuery({
     queryKey: ['adminGames'],
-    queryFn: () => {
-      // This would be replaced with a real API call in production
-      return Promise.resolve({
-        data: [
-          { _id: '1', title: 'Islamic True or False', description: 'Test your knowledge of Islamic facts', slug: 'true-false', gameType: 'true-false', iconName: 'check-circle', questionCount: 120 },
-          { _id: '2', title: 'Multiple Choice Quiz', description: 'Islamic knowledge quiz', slug: 'multiple-choice', gameType: 'multiple-choice', iconName: 'list', questionCount: 210 },
-          { _id: '3', title: 'Matching Game', description: 'Match Islamic concepts', slug: 'matching', gameType: 'matching', iconName: 'git-merge', questionCount: 80 },
-          { _id: '4', title: 'Word Search', description: 'Find Islamic terms', slug: 'word-search', gameType: 'word-search', iconName: 'search', questionCount: 95 },
-          { _id: '5', title: 'Islamic Quiz', description: 'Comprehensive Islamic quiz', slug: 'quiz', gameType: 'quiz', iconName: 'help-circle', questionCount: 168 },
-          { _id: '6', title: 'Islamic Flashcards', description: 'Learn Islamic concepts', slug: 'flashcards', gameType: 'flashcards', iconName: 'layers', questionCount: 120 },
-        ]
-      });
-    }
+    queryFn: () => gameService.getAllGames()
   });
   
   const games = gamesData?.data || [];
   
   // Filter games based on search term
-  const filteredGames = games.filter(game => 
+  const filteredGames = games.filter((game: GameType) => 
     game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     game.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     game.gameType.toLowerCase().includes(searchTerm.toLowerCase())
@@ -91,7 +81,7 @@ const Games = () => {
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead>Game Type</TableHead>
-                  <TableHead className="text-center">Questions</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -101,11 +91,25 @@ const Games = () => {
                     <TableCell colSpan={4} className="text-center h-24">No games found</TableCell>
                   </TableRow>
                 ) : (
-                  filteredGames.map((game) => (
+                  filteredGames.map((game: GameType) => (
                     <TableRow key={game._id}>
                       <TableCell className="font-medium">{game.title}</TableCell>
                       <TableCell>{game.gameType}</TableCell>
-                      <TableCell className="text-center">{game.questionCount}</TableCell>
+                      <TableCell className="text-center">
+                        {game.comingSoon ? (
+                          <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                            Coming Soon
+                          </span>
+                        ) : game.isActive ? (
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                            Active
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            Inactive
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button 
                           variant="outline" 
