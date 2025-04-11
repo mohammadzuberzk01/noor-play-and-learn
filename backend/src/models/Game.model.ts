@@ -6,7 +6,7 @@ export interface IGame extends Document {
   description: string;
   difficulty: 'easy' | 'medium' | 'hard';
   category: string;
-  gameType: 'true-false' | 'multiple-choice' | 'matching' | 'word-search' | 'other';
+  gameType: 'true-false' | 'multiple-choice' | 'matching' | 'word-search' | 'word-hunt' | 'quiz' | 'crossword' | 'flashcards' | 'memory' | 'puzzle' | 'other';
   slug: string;
   iconName: string;
   isActive: boolean;
@@ -39,7 +39,7 @@ const GameSchema = new Schema<IGame>(
     },
     gameType: {
       type: String,
-      enum: ['true-false', 'multiple-choice', 'matching', 'word-search', 'other'],
+      enum: ['true-false', 'multiple-choice', 'matching', 'word-search', 'word-hunt', 'quiz', 'crossword', 'flashcards', 'memory', 'puzzle', 'other'],
       default: 'other',
       required: [true, 'Game type is required'],
     },

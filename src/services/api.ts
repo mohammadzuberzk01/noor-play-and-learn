@@ -80,7 +80,7 @@ export const gameService = {
   }
 };
 
-// Questions by game type
+// Generic Question Service
 export const questionService = {
   getQuestions: async (gameSlug: string, params?: { difficulty?: string; limit?: number; offset?: number }) => {
     const response = await apiClient.get(`/games/${gameSlug}/questions`, { params });
@@ -107,11 +107,86 @@ export const questionService = {
     return response.data;
   },
   
-  deleteQuestion: async (gameSlug: string, questionId: string, questionType: string) => {
-    const response = await apiClient.delete(`/games/${gameSlug}/questions/${questionId}`, {
-      data: { questionType }
-    });
+  deleteQuestion: async (gameSlug: string, questionId: string) => {
+    const response = await apiClient.delete(`/games/${gameSlug}/questions/${questionId}`);
     return response.data;
+  }
+};
+
+// Game specific services
+export const gameQuestionServices = {
+  // Knowledge-based games
+  trueFalse: {
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('true-or-false', params),
+    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+      questionService.getRandomQuestions('true-or-false', { count, difficulty }),
+  },
+  
+  fiqhMastermind: {
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('fiqh-mastermind', params),
+    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+      questionService.getRandomQuestions('fiqh-mastermind', { count, difficulty }),
+  },
+  
+  quizDuel: {
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('quiz-duel', params),
+    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+      questionService.getRandomQuestions('quiz-duel', { count, difficulty }),
+  },
+  
+  trivia: {
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('trivia', params),
+    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+      questionService.getRandomQuestions('trivia', { count, difficulty }),
+  },
+  
+  // Word games
+  wordSearch: {
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('word-search', params),
+    getRandomQuestions: (count: number = 1, difficulty?: string) => 
+      questionService.getRandomQuestions('word-search', { count, difficulty }),
+  },
+  
+  wordOfTheDay: {
+    getWordOfTheDay: async () => {
+      const response = await apiClient.get('/word-of-the-day/today');
+      return response.data;
+    },
+    getWordByDate: async (date: string) => {
+      const response = await apiClient.get(`/word-of-the-day/date/${date}`);
+      return response.data;
+    }
+  },
+  
+  // Matching games
+  prophetMatch: {
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('prophet-match', params),
+    getRandomQuestions: (count: number = 1, difficulty?: string) => 
+      questionService.getRandomQuestions('prophet-match', { count, difficulty }),
+  },
+  
+  // Memory games
+  flashcards: {
+    getQuestions: (params?: { difficulty?: string; limit?: number; category?: string }) => 
+      questionService.getQuestions('flashcards', params),
+    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+      questionService.getRandomQuestions('flashcards', { count, difficulty }),
+  },
+  
+  // Helper function for any game
+  getGameQuestionService: (gameSlug: string) => {
+    return {
+      getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+        questionService.getQuestions(gameSlug, params),
+      getRandomQuestions: (count: number = 10, difficulty?: string) => 
+        questionService.getRandomQuestions(gameSlug, { count, difficulty }),
+    };
   }
 };
 
@@ -130,41 +205,6 @@ export const progressService = {
   updateGameProgress: async (gameSlug: string, progressData: any) => {
     const response = await apiClient.put(`/progress/${gameSlug}`, progressData);
     return response.data;
-  }
-};
-
-// Word of the Day
-export const wordOfTheDayService = {
-  getWordOfTheDay: async () => {
-    const response = await apiClient.get('/word-of-the-day/today');
-    return response.data;
-  },
-  
-  getWordByDate: async (date: string) => {
-    const response = await apiClient.get(`/word-of-the-day/date/${date}`);
-    return response.data;
-  }
-};
-
-// Game specific services - True or False
-export const trueOrFalseService = {
-  getQuestions: async (params?: { difficulty?: string; limit?: number }) => {
-    return questionService.getQuestions('true-or-false', params);
-  },
-  
-  getRandomQuestions: async (count: number = 10, difficulty?: string) => {
-    return questionService.getRandomQuestions('true-or-false', { count, difficulty });
-  }
-};
-
-// Game specific services - Word Search
-export const wordSearchService = {
-  getQuestions: async (params?: { difficulty?: string; limit?: number }) => {
-    return questionService.getQuestions('word-search', params);
-  },
-  
-  getRandomQuestions: async (count: number = 1, difficulty?: string) => {
-    return questionService.getRandomQuestions('word-search', { count, difficulty });
   }
 };
 

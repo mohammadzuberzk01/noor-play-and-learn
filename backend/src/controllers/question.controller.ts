@@ -1,6 +1,16 @@
 
 import { Request, Response } from 'express';
-import { TrueFalseQuestion, MultipleChoiceQuestion, MatchingQuestion, WordSearchQuestion } from '../models/Question.model';
+import { 
+  TrueFalseQuestion, 
+  MultipleChoiceQuestion, 
+  MatchingQuestion, 
+  WordSearchQuestion,
+  QuizQuestion,
+  Flashcard,
+  MemoryCard,
+  CrosswordPuzzle,
+  WordHunt
+} from '../models/Question.model';
 import Game from '../models/Game.model';
 import { logger } from '../utils/logger';
 
@@ -15,6 +25,16 @@ const getQuestionModel = (gameType: string) => {
       return MatchingQuestion;
     case 'word-search':
       return WordSearchQuestion;
+    case 'quiz':
+      return QuizQuestion;
+    case 'flashcards':
+      return Flashcard;
+    case 'memory':
+      return MemoryCard;
+    case 'crossword':
+      return CrosswordPuzzle;
+    case 'word-hunt':
+      return WordHunt;
     default:
       return null;
   }
@@ -36,23 +56,13 @@ export const getQuestions = async (req: Request, res: Response) => {
       });
     }
     
-    // Determine the question model based on game type
-    const gameType = game.category.toLowerCase().includes('true-false') 
-      ? 'true-false'
-      : game.category.toLowerCase().includes('multiple-choice')
-      ? 'multiple-choice'
-      : game.category.toLowerCase().includes('matching')
-      ? 'matching'
-      : game.category.toLowerCase().includes('word-search')
-      ? 'word-search'
-      : null;
-    
-    const QuestionModel = getQuestionModel(gameType || '');
+    // Get the question model based on game type
+    const QuestionModel = getQuestionModel(game.gameType);
     
     if (!QuestionModel) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid game type',
+        message: `Unsupported game type: ${game.gameType}`,
       });
     }
     
@@ -106,23 +116,13 @@ export const getQuestion = async (req: Request, res: Response) => {
       });
     }
     
-    // Determine the question model based on game type
-    const gameType = game.category.toLowerCase().includes('true-false') 
-      ? 'true-false'
-      : game.category.toLowerCase().includes('multiple-choice')
-      ? 'multiple-choice'
-      : game.category.toLowerCase().includes('matching')
-      ? 'matching'
-      : game.category.toLowerCase().includes('word-search')
-      ? 'word-search'
-      : null;
-    
-    const QuestionModel = getQuestionModel(gameType || '');
+    // Get the question model based on game type
+    const QuestionModel = getQuestionModel(game.gameType);
     
     if (!QuestionModel) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid game type',
+        message: `Unsupported game type: ${game.gameType}`,
       });
     }
     
@@ -156,9 +156,8 @@ export const getQuestion = async (req: Request, res: Response) => {
 export const createQuestion = async (req: Request, res: Response) => {
   try {
     const { gameSlug } = req.params;
-    const { questionType } = req.body;
     
-    // Find the game
+    // Find the game to determine its type
     const game = await Game.findOne({ slug: gameSlug });
     
     if (!game) {
@@ -168,13 +167,13 @@ export const createQuestion = async (req: Request, res: Response) => {
       });
     }
     
-    // Determine the question model based on question type
-    const QuestionModel = getQuestionModel(questionType);
+    // Get the question model based on game type
+    const QuestionModel = getQuestionModel(game.gameType);
     
     if (!QuestionModel) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid question type',
+        message: `Unsupported game type: ${game.gameType}`,
       });
     }
     
@@ -202,9 +201,8 @@ export const createQuestion = async (req: Request, res: Response) => {
 export const updateQuestion = async (req: Request, res: Response) => {
   try {
     const { gameSlug, questionId } = req.params;
-    const { questionType } = req.body;
     
-    // Find the game
+    // Find the game to determine its type
     const game = await Game.findOne({ slug: gameSlug });
     
     if (!game) {
@@ -214,13 +212,13 @@ export const updateQuestion = async (req: Request, res: Response) => {
       });
     }
     
-    // Determine the question model based on question type
-    const QuestionModel = getQuestionModel(questionType);
+    // Get the question model based on game type
+    const QuestionModel = getQuestionModel(game.gameType);
     
     if (!QuestionModel) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid question type',
+        message: `Unsupported game type: ${game.gameType}`,
       });
     }
     
@@ -255,9 +253,8 @@ export const updateQuestion = async (req: Request, res: Response) => {
 export const deleteQuestion = async (req: Request, res: Response) => {
   try {
     const { gameSlug, questionId } = req.params;
-    const { questionType } = req.body;
     
-    // Find the game
+    // Find the game to determine its type
     const game = await Game.findOne({ slug: gameSlug });
     
     if (!game) {
@@ -267,13 +264,13 @@ export const deleteQuestion = async (req: Request, res: Response) => {
       });
     }
     
-    // Determine the question model based on question type
-    const QuestionModel = getQuestionModel(questionType);
+    // Get the question model based on game type
+    const QuestionModel = getQuestionModel(game.gameType);
     
     if (!QuestionModel) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid question type',
+        message: `Unsupported game type: ${game.gameType}`,
       });
     }
     
@@ -321,23 +318,13 @@ export const getRandomQuestions = async (req: Request, res: Response) => {
       });
     }
     
-    // Determine the question model based on game type
-    const gameType = game.category.toLowerCase().includes('true-false') 
-      ? 'true-false'
-      : game.category.toLowerCase().includes('multiple-choice')
-      ? 'multiple-choice'
-      : game.category.toLowerCase().includes('matching')
-      ? 'matching'
-      : game.category.toLowerCase().includes('word-search')
-      ? 'word-search'
-      : null;
-    
-    const QuestionModel = getQuestionModel(gameType || '');
+    // Get the question model based on game type
+    const QuestionModel = getQuestionModel(game.gameType);
     
     if (!QuestionModel) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid game type',
+        message: `Unsupported game type: ${game.gameType}`,
       });
     }
     
