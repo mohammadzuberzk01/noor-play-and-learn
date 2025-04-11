@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Create an axios instance
@@ -116,8 +117,8 @@ export const questionService = {
 export const gameQuestionServices = {
   // Knowledge-based games
   trueFalse: {
-    getQuestions: (gameSlug = 'true-or-false', params?: { difficulty?: string; limit?: number }) => 
-      questionService.getQuestions(gameSlug, params),
+    getQuestions: (params?: { difficulty?: string; limit?: number }) => 
+      questionService.getQuestions('true-or-false', params),
     getRandomQuestions: (count = 10, difficulty?: string) => 
       questionService.getRandomQuestions('true-or-false', { count, difficulty }),
     createQuestion: (questionData: any) =>
@@ -131,30 +132,54 @@ export const gameQuestionServices = {
   fiqhMastermind: {
     getQuestions: (params?: { difficulty?: string; limit?: number }) => 
       questionService.getQuestions('fiqh-mastermind', params),
-    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+    getRandomQuestions: (count = 10, difficulty?: string) => 
       questionService.getRandomQuestions('fiqh-mastermind', { count, difficulty }),
+    createQuestion: (questionData: any) =>
+      questionService.createQuestion('fiqh-mastermind', questionData),
+    updateQuestion: (questionId: string, questionData: any) =>
+      questionService.updateQuestion('fiqh-mastermind', questionId, questionData),
+    deleteQuestion: (questionId: string) =>
+      questionService.deleteQuestion('fiqh-mastermind', questionId)
   },
   
   quizDuel: {
     getQuestions: (params?: { difficulty?: string; limit?: number }) => 
       questionService.getQuestions('quiz-duel', params),
-    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+    getRandomQuestions: (count = 10, difficulty?: string) => 
       questionService.getRandomQuestions('quiz-duel', { count, difficulty }),
+    createQuestion: (questionData: any) =>
+      questionService.createQuestion('quiz-duel', questionData),
+    updateQuestion: (questionId: string, questionData: any) =>
+      questionService.updateQuestion('quiz-duel', questionId, questionData),
+    deleteQuestion: (questionId: string) =>
+      questionService.deleteQuestion('quiz-duel', questionId)
   },
   
   trivia: {
     getQuestions: (params?: { difficulty?: string; limit?: number }) => 
       questionService.getQuestions('trivia', params),
-    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+    getRandomQuestions: (count = 10, difficulty?: string) => 
       questionService.getRandomQuestions('trivia', { count, difficulty }),
+    createQuestion: (questionData: any) =>
+      questionService.createQuestion('trivia', questionData),
+    updateQuestion: (questionId: string, questionData: any) =>
+      questionService.updateQuestion('trivia', questionId, questionData),
+    deleteQuestion: (questionId: string) =>
+      questionService.deleteQuestion('trivia', questionId)
   },
   
   // Word games
   wordSearch: {
     getQuestions: (params?: { difficulty?: string; limit?: number }) => 
       questionService.getQuestions('word-search', params),
-    getRandomQuestions: (count: number = 1, difficulty?: string) => 
+    getRandomQuestions: (count = 1, difficulty?: string) => 
       questionService.getRandomQuestions('word-search', { count, difficulty }),
+    createQuestion: (questionData: any) =>
+      questionService.createQuestion('word-search', questionData),
+    updateQuestion: (questionId: string, questionData: any) =>
+      questionService.updateQuestion('word-search', questionId, questionData),
+    deleteQuestion: (questionId: string) =>
+      questionService.deleteQuestion('word-search', questionId)
   },
   
   wordOfTheDay: {
@@ -165,6 +190,18 @@ export const gameQuestionServices = {
     getWordByDate: async (date: string) => {
       const response = await apiClient.get(`/word-of-the-day/date/${date}`);
       return response.data;
+    },
+    createWord: async (wordData: any) => {
+      const response = await apiClient.post('/word-of-the-day', wordData);
+      return response.data;
+    },
+    updateWord: async (wordId: string, wordData: any) => {
+      const response = await apiClient.put(`/word-of-the-day/${wordId}`, wordData);
+      return response.data;
+    },
+    deleteWord: async (wordId: string) => {
+      const response = await apiClient.delete(`/word-of-the-day/${wordId}`);
+      return response.data;
     }
   },
   
@@ -172,16 +209,28 @@ export const gameQuestionServices = {
   prophetMatch: {
     getQuestions: (params?: { difficulty?: string; limit?: number }) => 
       questionService.getQuestions('prophet-match', params),
-    getRandomQuestions: (count: number = 1, difficulty?: string) => 
+    getRandomQuestions: (count = 1, difficulty?: string) => 
       questionService.getRandomQuestions('prophet-match', { count, difficulty }),
+    createQuestion: (questionData: any) =>
+      questionService.createQuestion('prophet-match', questionData),
+    updateQuestion: (questionId: string, questionData: any) =>
+      questionService.updateQuestion('prophet-match', questionId, questionData),
+    deleteQuestion: (questionId: string) =>
+      questionService.deleteQuestion('prophet-match', questionId)
   },
   
   // Memory games
   flashcards: {
     getQuestions: (params?: { difficulty?: string; limit?: number; category?: string }) => 
       questionService.getQuestions('flashcards', params),
-    getRandomQuestions: (count: number = 10, difficulty?: string) => 
+    getRandomQuestions: (count = 10, difficulty?: string) => 
       questionService.getRandomQuestions('flashcards', { count, difficulty }),
+    createQuestion: (questionData: any) =>
+      questionService.createQuestion('flashcards', questionData),
+    updateQuestion: (questionId: string, questionData: any) =>
+      questionService.updateQuestion('flashcards', questionId, questionData),
+    deleteQuestion: (questionId: string) =>
+      questionService.deleteQuestion('flashcards', questionId)
   },
   
   // Helper function for any game
@@ -189,7 +238,7 @@ export const gameQuestionServices = {
     return {
       getQuestions: (params?: { difficulty?: string; limit?: number }) => 
         questionService.getQuestions(gameSlug, params),
-      getRandomQuestions: (count: number = 10, difficulty?: string) => 
+      getRandomQuestions: (count = 10, difficulty?: string) => 
         questionService.getRandomQuestions(gameSlug, { count, difficulty }),
       createQuestion: (questionData: any) =>
         questionService.createQuestion(gameSlug, questionData),
