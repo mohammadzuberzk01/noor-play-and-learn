@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, AlertTriangle, Shuffle, Timer } from 'lucide-react';
 import { toast } from 'sonner';
-import { trueOrFalseService } from '@/services/api';
+import { gameQuestionServices } from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 
 interface Question {
@@ -28,24 +27,21 @@ const TrueOrFalse = () => {
   const [gameOver, setGameOver] = useState(false);
   const [difficulty, setDifficulty] = useState<string | undefined>(undefined);
   
-  // Fetch questions from API
   const { data: questionsData, isLoading, error, refetch } = useQuery({
     queryKey: ['trueOrFalseQuestions', difficulty],
-    queryFn: () => trueOrFalseService.getRandomQuestions(10, difficulty),
+    queryFn: () => gameQuestionServices.trueFalse.getRandomQuestions(10, difficulty),
     enabled: false, // Don't fetch automatically
   });
   
   const questions = questionsData?.data || [];
   
   useEffect(() => {
-    // Set current question when questions are loaded or index changes
     if (questions.length > 0 && questionIndex < questions.length) {
       setCurrentQuestion(questions[questionIndex]);
     }
   }, [questions, questionIndex]);
   
   useEffect(() => {
-    // Timer logic
     let timer: number | undefined;
     
     if (gameActive && timeLeft > 0 && !showExplanation && !gameOver) {
@@ -53,7 +49,6 @@ const TrueOrFalse = () => {
         setTimeLeft(timeLeft - 1);
       }, 1000);
     } else if (gameActive && timeLeft === 0 && !showExplanation) {
-      // Time's up
       handleAnswer(null);
     }
     
@@ -72,7 +67,6 @@ const TrueOrFalse = () => {
     setTimeLeft(15);
     setDifficulty(selectedDifficulty);
     
-    // Fetch new questions
     try {
       await refetch();
     } catch (error) {
@@ -87,7 +81,6 @@ const TrueOrFalse = () => {
     setAnswer(userAnswer);
     setShowExplanation(true);
     
-    // If ran out of time or answered incorrectly
     if (userAnswer === null) {
       toast.error("Time's up!");
     } else if (userAnswer === currentQuestion.isTrue) {
@@ -99,14 +92,12 @@ const TrueOrFalse = () => {
   };
   
   const nextQuestion = () => {
-    // If this was the last question, end the game
     if (questionIndex >= questions.length - 1) {
       setGameOver(true);
       setGameActive(false);
       return;
     }
     
-    // Move to next question
     setQuestionIndex(questionIndex + 1);
     setAnswer(null);
     setShowExplanation(false);
