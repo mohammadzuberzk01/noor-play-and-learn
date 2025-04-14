@@ -30,7 +30,7 @@ export function ThemeProvider({
   children,
   defaultTheme = "system",
   storageKey = "theme",
-  attribute = "data-theme",
+  attribute = "class",
   enableSystem = true,
   disableTransitionOnChange = false,
 }: ThemeProviderProps) {
@@ -41,7 +41,7 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement
 
-    // Remove existing classes
+    // Remove existing class
     root.classList.remove("light", "dark")
 
     // Handle system preference
@@ -52,31 +52,39 @@ export function ThemeProvider({
         : "light"
 
       root.classList.add(systemTheme)
-      root.setAttribute(attribute, systemTheme)
       return
     }
 
-    // Set the theme
+    // Add theme class
     root.classList.add(theme)
-    root.setAttribute(attribute, theme)
-  }, [theme, enableSystem, attribute])
+  }, [theme, enableSystem])
 
-  // Add transition class to prevent flashing
+  // Store theme preference in local storage
   useEffect(() => {
-    if (disableTransitionOnChange) return
+    localStorage.setItem(storageKey, theme)
+  }, [theme, storageKey])
+
+  // Add listener for system theme changes
+  useEffect(() => {
+    if (!enableSystem) return
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
     
-    const root = window.document.documentElement
-    
-    // Add transition class
-    if (!root.classList.contains("transition-colors")) {
-      root.classList.add("transition-colors", "duration-300")
+    const handleChange = () => {
+      if (theme === "system") {
+        const root = window.document.documentElement
+        root.classList.remove("light", "dark")
+        root.classList.add(mediaQuery.matches ? "dark" : "light")
+      }
     }
-  }, [disableTransitionOnChange])
+
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [enableSystem, theme])
 
   const value = {
     theme,
     setTheme: (newTheme: Theme) => {
-      localStorage.setItem(storageKey, newTheme)
       setTheme(newTheme)
     },
   }
