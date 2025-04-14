@@ -10,7 +10,15 @@ import QuranicWordBingo from './pages/QuranicWordBingo';
 import WordOfTheDay from './pages/WordOfTheDay';
 import WordSearch from './pages/WordSearch';
 import TrueOrFalse from './pages/TrueOrFalse';
+import Crossword from './pages/Crossword';
+import DhikrQuest from './pages/DhikrQuest';
+import AyahAudio from './pages/AyahAudio';
+import AyahBreakdown from './pages/AyahBreakdown';
+import Profile from './pages/Profile';
+import Achievements from './pages/Achievements';
+import Leaderboard from './pages/Leaderboard';
 import AdminRoutes from './routes/AdminRoutes';
+import About from './pages/About';
 import { Toaster } from '@/components/ui/toaster';
 import NotFound from './pages/NotFound';
 
@@ -32,6 +40,10 @@ const gameRoutes = [
   { path: "/games/word-of-the-day", element: <WordOfTheDay /> },
   { path: "/games/word-search", element: <WordSearch /> },
   { path: "/games/true-or-false", element: <TrueOrFalse /> },
+  { path: "/games/crossword", element: <Crossword /> },
+  { path: "/games/dhikr-quest", element: <DhikrQuest /> },
+  { path: "/games/ayah-audio", element: <AyahAudio /> },
+  { path: "/games/ayah-breakdown", element: <AyahBreakdown /> },
   // Additional game routes - you would add all 37 game routes here
   { path: "/games/flashcards", element: <ProphetMatch /> }, // Need to create dedicated components 
   { path: "/games/matching", element: <ProphetMatch /> },    // for each game type or use a 
@@ -52,6 +64,12 @@ function App() {
             <Routes>
               <Route path="/" element={<Games />} />
               <Route path="/games" element={<Games />} />
+              
+              {/* User Profile Routes */}
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/achievements" element={<Achievements />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route path="/about" element={<About />} />
               
               {/* Dynamically render all game routes */}
               {gameRoutes.map((route) => (
