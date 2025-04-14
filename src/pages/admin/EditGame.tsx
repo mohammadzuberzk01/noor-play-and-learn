@@ -89,30 +89,35 @@ const EditGame = () => {
       }
       return Promise.reject(new Error('Game ID is required'));
     },
-    onSuccess: (data) => {
-      if (data?.data) {
-        // Populate form with game data
-        form.reset({
-          title: data.data.title,
-          description: data.data.description,
-          difficulty: data.data.difficulty,
-          category: data.data.category,
-          gameType: data.data.gameType,
-          slug: data.data.slug,
-          iconName: data.data.iconName,
-          isActive: data.data.isActive,
-          comingSoon: data.data.comingSoon,
-        });
-      }
-    },
-    onError: (error) => {
+  });
+  
+  // Update form with game data when it's loaded
+  useEffect(() => {
+    if (gameData?.data) {
+      form.reset({
+        title: gameData.data.title,
+        description: gameData.data.description,
+        difficulty: gameData.data.difficulty,
+        category: gameData.data.category,
+        gameType: gameData.data.gameType,
+        slug: gameData.data.slug,
+        iconName: gameData.data.iconName,
+        isActive: gameData.data.isActive,
+        comingSoon: gameData.data.comingSoon,
+      });
+    }
+  }, [gameData, form]);
+  
+  // Handle API errors
+  useEffect(() => {
+    if (error) {
       toast({
         title: "Error",
         description: "Failed to fetch game details",
         variant: "destructive",
       });
     }
-  });
+  }, [error, toast]);
   
   const onSubmit = async (values: FormValues) => {
     try {
