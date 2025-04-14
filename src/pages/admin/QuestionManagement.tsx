@@ -55,6 +55,19 @@ const flashcardSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
+// Define types for the different question forms
+type TrueFalseFormValues = z.infer<typeof trueFalseSchema>;
+type MultipleChoiceFormValues = z.infer<typeof multipleChoiceSchema>;
+type MatchingFormValues = z.infer<typeof matchingSchema>;
+type FlashcardFormValues = z.infer<typeof flashcardSchema>;
+
+// Union type for all possible form values
+type QuestionFormValues = 
+  | TrueFalseFormValues 
+  | MultipleChoiceFormValues 
+  | MatchingFormValues 
+  | FlashcardFormValues;
+
 // Get the appropriate schema based on game type
 const getFormSchema = (gameType: string) => {
   switch (gameType) {
@@ -73,24 +86,24 @@ const getFormSchema = (gameType: string) => {
 };
 
 // Get default values based on game type
-const getDefaultValues = (gameType: string) => {
+const getDefaultValues = (gameType: string): QuestionFormValues => {
   switch (gameType) {
     case 'true-false':
       return {
         text: '',
         isTrue: false,
         explanation: '',
-        difficulty: 'medium',
+        difficulty: 'medium' as const,
         isActive: true,
       };
     case 'multiple-choice':
     case 'quiz':
       return {
         question: '',
-        options: ['', '', '', ''],
+        options: ['', ''],
         correctOptionIndex: 0,
         explanation: '',
-        difficulty: 'medium',
+        difficulty: 'medium' as const,
         isActive: true,
       };
     case 'matching':
@@ -99,7 +112,7 @@ const getDefaultValues = (gameType: string) => {
           { left: '', right: '' },
           { left: '', right: '' },
         ],
-        difficulty: 'medium',
+        difficulty: 'medium' as const,
         isActive: true,
       };
     case 'flashcards':
@@ -107,7 +120,7 @@ const getDefaultValues = (gameType: string) => {
         front: '',
         back: '',
         category: '',
-        difficulty: 'medium',
+        difficulty: 'medium' as const,
         isActive: true,
       };
     default:
@@ -115,10 +128,27 @@ const getDefaultValues = (gameType: string) => {
         text: '',
         isTrue: false,
         explanation: '',
-        difficulty: 'medium',
+        difficulty: 'medium' as const,
         isActive: true,
       };
   }
+};
+
+// Type guard functions to check form value types
+const isTrueFalseForm = (form: QuestionFormValues): form is TrueFalseFormValues => {
+  return 'text' in form && 'isTrue' in form;
+};
+
+const isMultipleChoiceForm = (form: QuestionFormValues): form is MultipleChoiceFormValues => {
+  return 'question' in form && 'options' in form;
+};
+
+const isMatchingForm = (form: QuestionFormValues): form is MatchingFormValues => {
+  return 'pairs' in form;
+};
+
+const isFlashcardForm = (form: QuestionFormValues): form is FlashcardFormValues => {
+  return 'front' in form && 'back' in form;
 };
 
 const QuestionManagement = () => {
@@ -159,7 +189,7 @@ const QuestionManagement = () => {
   }, [gameData, location.state]);
   
   // Create form based on game type
-  const form = useForm({
+  const form = useForm<QuestionFormValues>({
     resolver: zodResolver(getFormSchema(gameType)),
     defaultValues: getDefaultValues(gameType),
   });
@@ -254,7 +284,7 @@ const QuestionManagement = () => {
     return true;
   });
   
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: QuestionFormValues) => {
     mutation.mutate(values);
   };
   
@@ -269,22 +299,22 @@ const QuestionManagement = () => {
         explanation: question.explanation,
         difficulty: question.difficulty,
         isActive: question.isActive,
-      });
+      } as TrueFalseFormValues);
     } else if (gameType === 'multiple-choice' || gameType === 'quiz') {
       form.reset({
         question: question.question,
-        options: question.options,
+        options: question.options || ['', ''],
         correctOptionIndex: question.correctOptionIndex,
         explanation: question.explanation,
         difficulty: question.difficulty,
         isActive: question.isActive,
-      });
+      } as MultipleChoiceFormValues);
     } else if (gameType === 'matching') {
       form.reset({
-        pairs: question.pairs,
+        pairs: question.pairs || [{ left: '', right: '' }, { left: '', right: '' }],
         difficulty: question.difficulty,
         isActive: question.isActive,
-      });
+      } as MatchingFormValues);
     } else if (gameType === 'flashcards') {
       form.reset({
         front: question.front,
@@ -292,7 +322,7 @@ const QuestionManagement = () => {
         category: question.category,
         difficulty: question.difficulty,
         isActive: question.isActive,
-      });
+      } as FlashcardFormValues);
     }
     
     setIsDialogOpen(true);
@@ -440,7 +470,7 @@ const QuestionManagement = () => {
               )}
             />
             
-            {form.watch('options')?.map((_, index) => (
+            {form.getValues('options') && form.getValues('options').map((_, index) => (
               <FormField
                 key={index}
                 control={form.control}
@@ -461,7 +491,8 @@ const QuestionManagement = () => {
               type="button"
               variant="outline"
               onClick={() => {
-                const currentOptions = form.getValues('options') || [];
+                const currentOptions = form.getValues('options');
+                if (!currentOptions) return;
                 form.setValue('options', [...currentOptions, '']);
               }}
             >
@@ -476,8 +507,8 @@ const QuestionManagement = () => {
                   <FormLabel>Correct Option</FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(parseInt(value))}
-                    defaultValue={field.value.toString()}
-                    value={field.value.toString()}
+                    defaultValue={field.value?.toString() || "0"}
+                    value={field.value?.toString() || "0"}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -485,7 +516,7 @@ const QuestionManagement = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {form.watch('options')?.map((option, index) => (
+                      {form.getValues('options') && form.getValues('options').map((option, index) => (
                         <SelectItem key={index} value={index.toString()}>
                           Option {index + 1}
                         </SelectItem>
@@ -673,12 +704,12 @@ const QuestionManagement = () => {
       return (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {form.watch('pairs')?.map((_, index) => (
+            {form.getValues('pairs') && form.getValues('pairs').map((_, index) => (
               <div key={index} className="border p-4 rounded-lg space-y-4">
                 <h3 className="font-medium">Pair {index + 1}</h3>
                 <FormField
                   control={form.control}
-                  name={`pairs.${index}.left`}
+                  name={`pairs.${index}.left` as any}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Left Item</FormLabel>
@@ -691,7 +722,7 @@ const QuestionManagement = () => {
                 />
                 <FormField
                   control={form.control}
-                  name={`pairs.${index}.right`}
+                  name={`pairs.${index}.right` as any}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Right Item</FormLabel>
@@ -709,7 +740,8 @@ const QuestionManagement = () => {
               type="button"
               variant="outline"
               onClick={() => {
-                const currentPairs = form.getValues('pairs') || [];
+                const currentPairs = form.getValues('pairs');
+                if (!currentPairs) return;
                 form.setValue('pairs', [...currentPairs, { left: '', right: '' }]);
               }}
             >
