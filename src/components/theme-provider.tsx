@@ -41,8 +41,10 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement
 
+    // Remove existing classes
     root.classList.remove("light", "dark")
 
+    // Handle system preference
     if (theme === "system" && enableSystem) {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
@@ -50,11 +52,26 @@ export function ThemeProvider({
         : "light"
 
       root.classList.add(systemTheme)
+      root.setAttribute(attribute, systemTheme)
       return
     }
 
+    // Set the theme
     root.classList.add(theme)
-  }, [theme, enableSystem])
+    root.setAttribute(attribute, theme)
+  }, [theme, enableSystem, attribute])
+
+  // Add transition class to prevent flashing
+  useEffect(() => {
+    if (disableTransitionOnChange) return
+    
+    const root = window.document.documentElement
+    
+    // Add transition class
+    if (!root.classList.contains("transition-colors")) {
+      root.classList.add("transition-colors", "duration-300")
+    }
+  }, [disableTransitionOnChange])
 
   const value = {
     theme,

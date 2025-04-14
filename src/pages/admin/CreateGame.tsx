@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { gameService } from '@/services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
 
 const gameTypeOptions = [
   { value: 'true-false', label: 'True/False' },
@@ -59,11 +59,9 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const EditGame = () => {
-  const { id } = useParams<{ id: string }>();
+const CreateGame = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -80,78 +78,29 @@ const EditGame = () => {
     },
   });
   
-  // Fetch game data
-  const { data: gameData, isLoading, error } = useQuery({
-    queryKey: ['game', id],
-    queryFn: () => {
-      // In a real app, this would be a real API call to get a specific game by ID
-      if (id) {
-        return gameService.getGameById(id);
-      }
-      return Promise.reject(new Error('Game ID is required'));
-    },
-  });
-  
-  // Update form with game data when it's loaded
-  useEffect(() => {
-    if (gameData?.data) {
-      form.reset({
-        title: gameData.data.title,
-        description: gameData.data.description,
-        difficulty: gameData.data.difficulty,
-        category: gameData.data.category,
-        gameType: gameData.data.gameType,
-        slug: gameData.data.slug,
-        iconName: gameData.data.iconName,
-        isActive: gameData.data.isActive,
-        comingSoon: gameData.data.comingSoon,
-      });
-    }
-  }, [gameData, form]);
-  
-  // Handle API errors
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch game details",
-        variant: "destructive",
-      });
-    }
-  }, [error, toast]);
-  
-  // Mutation for updating game
-  const updateMutation = useMutation({
+  const createGameMutation = useMutation({
     mutationFn: (values: FormValues) => {
-      if (!id) throw new Error('Game ID is required');
-      return gameService.updateGame(id, values);
+      return gameService.createGame(values);
     },
     onSuccess: () => {
       toast({
         title: "Success",
-        description: "Game updated successfully",
+        description: "Game created successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ['game', id] });
       navigate('/admin/games');
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update game",
+        description: error instanceof Error ? error.message : "Failed to create game",
         variant: "destructive",
       });
     }
   });
   
-  const onSubmit = (values: FormValues) => {
-    updateMutation.mutate(values);
+  const onSubmit = async (values: FormValues) => {
+    createGameMutation.mutate(values);
   };
-  
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>;
-  }
   
   return (
     <div className="space-y-6">
@@ -164,7 +113,7 @@ const EditGame = () => {
         >
           <ArrowLeft className="h-4 w-4 mr-1" /> Back to Games
         </Button>
-        <h1 className="text-3xl font-bold">Edit Game</h1>
+        <h1 className="text-3xl font-bold">Create New Game</h1>
       </div>
       
       <Card>
@@ -366,11 +315,11 @@ const EditGame = () => {
               <div className="flex justify-end">
                 <Button 
                   type="submit" 
-                  className="w-full md:w-auto"
-                  disabled={updateMutation.isPending}
+                  className="w-full md:w-auto" 
+                  disabled={createGameMutation.isPending}
                 >
                   <Save className="mr-2 h-4 w-4" /> 
-                  {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                  {createGameMutation.isPending ? 'Creating...' : 'Create Game'}
                 </Button>
               </div>
             </form>
@@ -381,4 +330,4 @@ const EditGame = () => {
   );
 };
 
-export default EditGame;
+export default CreateGame;

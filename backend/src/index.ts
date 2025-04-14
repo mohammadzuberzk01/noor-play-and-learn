@@ -8,6 +8,7 @@ import { connectDB } from './config/database';
 import { logger } from './utils/logger';
 import { seedDatabase } from './utils/seed';
 import { advancedSeedDatabase } from './utils/advanced-seed';
+import { syncAllData } from './utils/sync-all-data';
 
 // Routes
 import authRoutes from './routes/auth.routes';
@@ -47,6 +48,20 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
 });
 
+// Admin route to sync all data
+app.get('/api/admin/sync-data', async (req, res) => {
+  try {
+    const result = await syncAllData();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to sync data',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
 // Connect to MongoDB and start server
 const startServer = async () => {
   try {
@@ -59,6 +74,9 @@ const startServer = async () => {
       
       // Use advanced seeding for more comprehensive data
       await advancedSeedDatabase();
+      
+      // Also sync all games and questions
+      await syncAllData();
     }
     
     app.listen(PORT, () => {
