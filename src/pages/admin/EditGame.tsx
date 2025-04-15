@@ -80,15 +80,15 @@ const EditGame = () => {
     },
   });
   
-  // Fetch game data
+  // Fetch game data using slug rather than ID
   const { data: gameData, isLoading, error } = useQuery({
     queryKey: ['game', id],
     queryFn: () => {
-      // In a real app, this would be a real API call to get a specific game by ID
-      if (id) {
-        return gameService.getGameById(id);
-      }
-      return Promise.reject(new Error('Game ID is required'));
+      if (!id) return Promise.reject(new Error('Game ID is required'));
+      
+      // Use the updateGame endpoint to first get the game's data
+      // This is a temporary solution until we update the backend to support getGameById
+      return gameService.getGameBySlug(id);
     },
   });
   
