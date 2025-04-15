@@ -6,6 +6,7 @@ import {
   createGame,
   updateGame,
   deleteGame,
+  getGameById,
 } from '../controllers/game.controller';
 import { protect, authorize } from '../middleware/auth.middleware';
 
@@ -14,6 +15,7 @@ const router = express.Router();
 // Public routes
 router.get('/', getAllGames);
 router.get('/:slug', getGameBySlug);
+router.get('/id/:id', getGameById); // Add route to get game by ID
 
 // Admin routes
 router.use(protect);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -80,19 +79,15 @@ const EditGame = () => {
     },
   });
   
-  // Fetch game data using slug rather than ID
   const { data: gameData, isLoading, error } = useQuery({
     queryKey: ['game', id],
     queryFn: () => {
       if (!id) return Promise.reject(new Error('Game ID is required'));
       
-      // Use the updateGame endpoint to first get the game's data
-      // This is a temporary solution until we update the backend to support getGameById
-      return gameService.getGameBySlug(id);
+      return gameService.getGameById(id);
     },
   });
   
-  // Update form with game data when it's loaded
   useEffect(() => {
     if (gameData?.data) {
       form.reset({
@@ -109,7 +104,6 @@ const EditGame = () => {
     }
   }, [gameData, form]);
   
-  // Handle API errors
   useEffect(() => {
     if (error) {
       toast({
@@ -120,7 +114,6 @@ const EditGame = () => {
     }
   }, [error, toast]);
   
-  // Mutation for updating game
   const updateMutation = useMutation({
     mutationFn: (values: FormValues) => {
       if (!id) throw new Error('Game ID is required');

@@ -1,4 +1,3 @@
-
 import { Request, Response } from 'express';
 import Game from '../models/Game.model';
 import { logger } from '../utils/logger';
@@ -53,6 +52,31 @@ export const getGameBySlug = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Get game by slug error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching game',
+    });
+  }
+};
+
+// Get single game by ID
+export const getGameById = async (req: Request, res: Response) => {
+  try {
+    const game = await Game.findById(req.params.id);
+    
+    if (!game) {
+      return res.status(404).json({
+        success: false,
+        message: 'Game not found',
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: game,
+    });
+  } catch (error) {
+    logger.error('Get game by ID error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error while fetching game',

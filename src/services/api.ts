@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Create an axios instance
@@ -90,6 +91,11 @@ export const gameService = {
   
   getGameBySlug: async (slug: string) => {
     const response = await apiClient.get(`/games/${slug}`);
+    return response.data;
+  },
+  
+  getGameById: async (id: string) => {
+    const response = await apiClient.get(`/games/id/${id}`);
     return response.data;
   },
   
