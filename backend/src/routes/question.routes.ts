@@ -12,12 +12,12 @@ import { protect, authorize } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-// Public routes
+// Public routes - No authentication needed
 router.get('/:gameSlug/questions', getQuestions);
 router.get('/:gameSlug/questions/random', getRandomQuestions);
 router.get('/:gameSlug/questions/:questionId', getQuestion);
 
-// Admin routes
+// Admin routes - Authentication required
 router.use(protect);
 router.use(authorize('admin'));
 
